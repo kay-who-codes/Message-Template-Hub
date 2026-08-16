@@ -17,6 +17,14 @@
       "tags": ["Brand", "Guidelines"]
     },
     {
+      "id": "redactrestore",
+      "name": "Redact Restore",
+      "description": "Strip data frome code for sending to an LLM — restore it after",
+      "icon": "❌",
+      "file": "RedactRestore/index.html",
+      "tags": ["Programming", "Code"]
+    },
+    {
       "id": "refundrequest",
       "name": "Refund Request",
       "description": "UK Consumer Law refund template",
