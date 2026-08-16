@@ -1,0 +1,12 @@
+{
+  "templates": [
+    {
+      "id": "refundrequest",
+      "name": "Refund Request",
+      "description": "UK Consumer Law refund template",
+      "icon": "⚖️",
+      "file": "RefundRequest/index.html",
+      "tags": ["Consumer", "UK"]
+    }
+  ]
+}
