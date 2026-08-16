@@ -1,0 +1,110 @@
+[
+  {
+    "name": "Make an App Prompt",
+    "summary": "An AI prompt preconfigured for personal preference",
+    "tags": ["AI Prompt", "Programming"],
+    "copyable-message": "Create a minimalistic darkmode HTML app, with V_1 accent colours, with the purpose of V_2"
+  },
+  {
+    "name": "Professional Email Template",
+    "summary": "Formal business email for client communication",
+    "tags": ["Email", "Business", "Communication"],
+    "copyable-message": "Dear V_1, V_2"
+  },
+  {
+    "name": "Code Review Request",
+    "summary": "Template for requesting code reviews from team members",
+    "tags": ["Programming", "Code Review", "Team"],
+    "copyable-message": "Hi V_1,\n\nCould you please review my V_2 implementation? The main changes include V_3. I'm particularly concerned about V_4 and would appreciate your feedback.\n\nPR link: V_5\n\nThanks!"
+  },
+  {
+    "name": "Meeting Invitation",
+    "summary": "Professional meeting request template",
+    "tags": ["Meeting", "Business", "Schedule"],
+    "copyable-message": "Hi V_1,\n\nI'd like to schedule a meeting to discuss V_2. Would V_3 work for you? The meeting should take approximately V_4 minutes.\n\nAgenda:\n- V_5\n\nPlease let me know if this time works or suggest an alternative.\n\nBest,\nV_6"
+  },
+  {
+    "name": "Bug Report Template",
+    "summary": "Structured template for reporting software bugs",
+    "tags": ["Programming", "Bug Report", "QA"],
+    "copyable-message": "**Bug Report**\n\n**Title:** V_1\n\n**Environment:** V_2\n\n**Steps to Reproduce:**\n1. V_3\n2. V_4\n3. V_5\n\n**Expected Result:** V_6\n\n**Actual Result:** V_7\n\n**Additional Notes:** V_8"
+  },
+  {
+    "name": "Social Media Post",
+    "summary": "Engaging social media content template",
+    "tags": ["Social Media", "Marketing", "Content"],
+    "copyable-message": "🚀 Excited to share that V_1! \n\nThis means V_2 for our community. Special thanks to V_3 for making this possible.\n\n#V_4 #V_5 #V_6\n\nWhat are your thoughts? Let me know in the comments! 👇"
+  },
+  {
+    "name": "Project Proposal",
+    "summary": "Basic project proposal structure",
+    "tags": ["Business", "Project", "Proposal"],
+    "copyable-message": "**Project Proposal: V_1**\n\n**Objective:** V_2\n\n**Timeline:** V_3\n\n**Budget:** V_4\n\n**Key Deliverables:**\n- V_5\n- V_6\n- V_7\n\n**Expected Outcomes:** V_8\n\n**Next Steps:** V_9"
+  },
+  {
+    "name": "Thank You Note",
+    "summary": "Grateful acknowledgment message",
+    "tags": ["Gratitude", "Communication", "Personal"],
+    "copyable-message": "Dear V_1,\n\nThank you so much for V_2. Your V_3 really made a difference and I truly appreciate V_4.\n\nI'm grateful to have someone like you who V_5.\n\nWith sincere appreciation,\nV_6"
+  },
+  {
+    "name": "API Documentation",
+    "summary": "Template for documenting API endpoints",
+    "tags": ["Programming", "API", "Documentation"],
+    "copyable-message": "## V_1\n\n**Endpoint:** `V_2 /V_3`\n\n**Description:** V_4\n\n**Parameters:**\n- `V_5` (V_6): V_7\n- `V_8` (V_9): V_10\n\n**Response:**\n```json\n{\n  \"V_11\": \"V_12\",\n  \"V_13\": V_14\n}\n```\n\n**Example:**\n```\nV_15\n```"
+  },
+  {
+    "name": "Apology Message",
+    "summary": "Professional apology template",
+    "tags": ["Communication", "Apology", "Business"],
+    "copyable-message": "Dear V_1,\n\nI sincerely apologize for V_2. I understand that this has caused V_3 and I take full responsibility.\n\nTo make this right, I will V_4 by V_5.\n\nI value our V_6 and will ensure this doesn't happen again.\n\nSincerely,\nV_7"
+  },
+  {
+    "name": "Event Announcement",
+    "summary": "Template for announcing events",
+    "tags": ["Event", "Announcement", "Marketing"],
+    "copyable-message": "🎉 You're Invited! 🎉\n\n**Event:** V_1\n**Date:** V_2\n**Time:** V_3\n**Location:** V_4\n\n**What to Expect:**\n• V_5\n• V_6\n• V_7\n\n**RSVP:** V_8\n\nCan't wait to see you there! Questions? Contact V_9"
+  },
+  {
+    "name": "Feedback Request",
+    "summary": "Polite request for feedback or reviews",
+    "tags": ["Feedback", "Customer Service", "Business"],
+    "copyable-message": "Hi V_1,\n\nI hope you're enjoying V_2! Your experience matters to us, and we'd love to hear your thoughts.\n\nCould you spare V_3 minutes to V_4? Your feedback helps us V_5.\n\n[Link/Instructions: V_6]\n\nThank you for being a valued V_7!\n\nBest regards,\nV_8"
+  },
+  {
+    "name": "Job Application Follow-up",
+    "summary": "Professional follow-up after job application",
+    "tags": ["Job Search", "Career", "Communication"],
+    "copyable-message": "Dear V_1,\n\nI hope this email finds you well. I wanted to follow up on my application for the V_2 position I submitted on V_3.\n\nI remain very interested in this opportunity and believe my experience in V_4 would be valuable to your team.\n\nI would welcome the chance to discuss how my skills in V_5 align with your needs.\n\nThank you for your consideration.\n\nBest regards,\nV_6"
+  },
+  {
+    "name": "Customer Support Response",
+    "summary": "Helpful customer service reply template",
+    "tags": ["Customer Service", "Support", "Business"],
+    "copyable-message": "Hello V_1,\n\nThank you for contacting us about V_2. I understand your concern regarding V_3.\n\nHere's what I can do to help:\n\n1. V_4\n2. V_5\n3. V_6\n\nThis should resolve the issue within V_7. I'll follow up with you on V_8 to ensure everything is working properly.\n\nIs there anything else I can help you with today?\n\nBest regards,\nV_9\nCustomer Success Team"
+  },
+  {
+    "name": "Project Status Update",
+    "summary": "Weekly or monthly project progress report",
+    "tags": ["Project Management", "Status", "Business"],
+    "copyable-message": "**Project Status Update: V_1**\n\n**Reporting Period:** V_2\n\n**Completed This Period:**\n✅ V_3\n✅ V_4\n✅ V_5\n\n**In Progress:**\n🔄 V_6 (V_7% complete)\n🔄 V_8 (V_9% complete)\n\n**Upcoming:**\n📋 V_10\n📋 V_11\n\n**Blockers/Issues:** V_12\n\n**Overall Status:** V_13\n\n**Next Update:** V_14"
+  },
+  {
+    "name": "Sales Pitch Email",
+    "summary": "Compelling sales outreach template",
+    "tags": ["Sales", "Marketing", "Business"],
+    "copyable-message": "Hi V_1,\n\nI noticed that V_2 and thought you might be interested in how V_3 helped similar companies achieve V_4.\n\nSpecifically, we helped V_5 increase their V_6 by V_7% in just V_8 months.\n\nI'd love to show you how we could help V_9 achieve similar results. Would you be open to a brief V_10-minute call this week?\n\nI'm available V_11 or V_12.\n\nBest regards,\nV_13"
+  },
+  {
+    "name": "Learning Resource Request",
+    "summary": "Template for asking about educational materials",
+    "tags": ["Education", "Learning", "Resources"],
+    "copyable-message": "Hello V_1,\n\nI'm currently learning about V_2 and was wondering if you could recommend resources for V_3.\n\nI'm particularly interested in:\n• V_4\n• V_5\n• V_6\n\nMy current level is V_7 and I'm hoping to V_8 within V_9.\n\nAny suggestions for books, courses, or tools would be greatly appreciated!\n\nThanks in advance,\nV_10"
+  },
+  {
+    "name": "Collaboration Proposal",
+    "summary": "Template for proposing partnerships or collaborations",
+    "tags": ["Collaboration", "Partnership", "Business"],
+    "copyable-message": "Dear V_1,\n\nI've been following V_2 and am impressed by your work in V_3. I believe there's an opportunity for us to collaborate on V_4.\n\nHere's what I'm thinking:\n\n**The Opportunity:** V_5\n\n**What We Bring:** V_6\n\n**What We're Looking For:** V_7\n\n**Potential Benefits:**\n• V_8\n• V_9\n• V_10\n\nWould you be interested in a brief call to explore this further? I'm available V_11.\n\nLooking forward to your thoughts!\n\nBest,\nV_12"
+  }
+]

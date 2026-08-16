@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Variable Message Bank</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#131313;
+    --surface:#1a1a1a;
+    --surface-2:#202020;
+    --border:#2a2a2a;
+    --text:#ececec;
+    --muted:#8a8a8a;
+    --orange:#ffa238;
+    --blue:#6babff;
+    --green:#60bc1b;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'DM Mono', monospace;
+    display:flex;
+    overflow:hidden;
+  }
+  ::selection{background:var(--orange);color:#131313;}
+  ::-webkit-scrollbar{width:10px;height:10px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  ::-webkit-scrollbar-thumb{background:#2f2f2f;border-radius:8px;}
+  ::-webkit-scrollbar-thumb:hover{background:#3c3c3c;}
+
+  /* ---------- Sidebar ---------- */
+  .sidebar{
+    width:250px;
+    min-width:250px;
+    height:100vh;
+    background:var(--surface);
+    border-right:1px solid var(--border);
+    display:flex;
+    flex-direction:column;
+    padding:22px 0 0 0;
+  }
+  .brand{
+    padding:0 20px 18px 20px;
+    border-bottom:1px solid var(--border);
+  }
+  .brand h1{
+    font-family:'Syne',sans-serif;
+    font-weight:800;
+    font-size:19px;
+    margin:0 0 4px 0;
+    letter-spacing:-0.02em;
+  }
+  .brand h1 .dot{color:var(--orange);}
+  .brand p{
+    margin:0;
+    font-size:11px;
+    color:var(--muted);
+    letter-spacing:0.02em;
+  }
+  .tag-list{
+    flex:1;
+    overflow-y:auto;
+    padding:14px 10px 14px 10px;
+  }
+  .tag-list-label{
+    font-family:'Syne',sans-serif;
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:0.12em;
+    color:var(--muted);
+    padding:6px 10px 8px 10px;
+  }
+  .tag-item{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    width:100%;
+    background:none;
+    border:none;
+    color:var(--text);
+    font-family:'DM Mono',monospace;
+    font-size:12.5px;
+    text-align:left;
+    padding:8px 10px;
+    border-radius:7px;
+    cursor:pointer;
+    transition:background .12s ease;
+  }
+  .tag-item:hover{background:var(--surface-2);}
+  .tag-item.active{background:var(--surface-2);}
+  .tag-item.active .tag-swatch{box-shadow:0 0 0 3px rgba(255,162,56,0.18);}
+  .tag-swatch{
+    width:8px;height:8px;border-radius:2px;flex-shrink:0;
+  }
+  .tag-item .tag-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .tag-item .tag-count{color:var(--muted);font-size:11px;}
+  .tag-item.active .tag-count{color:var(--orange);}
+  .sidebar-footer{
+    padding:12px 20px;
+    border-top:1px solid var(--border);
+    font-size:11px;
+    color:var(--muted);
+    display:flex;
+    justify-content:space-between;
+  }
+  .sidebar-footer b{color:var(--text);}
+
+  /* ---------- Main ---------- */
+  .main{
+    flex:1;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    min-width:0;
+  }
+  .topbar{
+    padding:20px 28px 16px 28px;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    gap:12px;
+    align-items:center;
+    background:var(--bg);
+  }
+  .search-wrap{
+    position:relative;
+    flex:1;
+    max-width:480px;
+  }
+  .search-wrap svg{
+    position:absolute;left:13px;top:50%;transform:translateY(-50%);
+    width:15px;height:15px;stroke:var(--muted);
+  }
+  #searchInput{
+    width:100%;
+    background:var(--surface);
+    border:1px solid var(--border);
+    color:var(--text);
+    font-family:'DM Mono',monospace;
+    font-size:13px;
+    padding:10px 14px 10px 36px;
+    border-radius:8px;
+    outline:none;
+    transition:border-color .12s ease;
+  }
+  #searchInput:focus{border-color:var(--orange);}
+  #searchInput::placeholder{color:var(--muted);}
+  .kbd{
+    position:absolute;right:10px;top:50%;transform:translateY(-50%);
+    font-size:10px;color:var(--muted);
+    border:1px solid var(--border);
+    padding:2px 5px;border-radius:4px;
+    pointer-events:none;
+  }
+  .result-count{
+    font-size:12px;
+    color:var(--muted);
+    white-space:nowrap;
+  }
+  .result-count b{color:var(--orange);}
+  .clear-filter{
+    font-size:11px;
+    color:var(--blue);
+    background:none;
+    border:1px solid var(--border);
+    padding:7px 12px;
+    border-radius:7px;
+    cursor:pointer;
+    display:none;
+    font-family:'DM Mono',monospace;
+  }
+  .clear-filter:hover{border-color:var(--blue);}
+  .clear-filter.visible{display:inline-block;}
+
+  .grid-scroll{
+    flex:1;
+    overflow-y:auto;
+    padding:20px 28px 60px 28px;
+  }
+  .messages-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(300px,1fr));
+    gap:12px;
+    align-items:start;
+  }
+
+  .message-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:14px 14px 12px 14px;
+    cursor:pointer;
+    transition:border-color .12s ease, transform .08s ease;
+  }
+  .message-card:hover{border-color:#3a3a3a;}
+  .message-card.expanded{
+    grid-column: span 2;
+    border-color:var(--orange);
+    cursor:default;
+  }
+  @media (max-width:760px){
+    .message-card.expanded{grid-column:span 1;}
+  }
+
+  .card-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:10px;
+  }
+  .card-title{
+    font-family:'Syne',sans-serif;
+    font-weight:700;
+    font-size:14px;
+    margin:0 0 4px 0;
+    letter-spacing:-0.01em;
+  }
+  .card-summary{
+    margin:0;
+    font-size:11.5px;
+    color:var(--muted);
+    line-height:1.45;
+  }
+  .copy-btn{
+    flex-shrink:0;
+    font-family:'DM Mono',monospace;
+    font-size:11px;
+    background:var(--surface-2);
+    color:var(--text);
+    border:1px solid var(--border);
+    padding:6px 10px;
+    border-radius:6px;
+    cursor:pointer;
+    transition:background .12s ease, border-color .12s ease;
+  }
+  .copy-btn:hover{border-color:var(--orange);color:var(--orange);}
+  .copy-btn.copied{background:var(--green);color:#0d0d0d;border-color:var(--green);}
+
+  .tags-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:5px;
+    margin-top:10px;
+  }
+  .tag-chip{
+    font-size:10px;
+    padding:3px 7px;
+    border-radius:5px;
+    background:rgba(255,162,56,0.08);
+    color:var(--orange);
+    border:1px solid rgba(255,162,56,0.2);
+  }
+
+  .expanded-content{
+    display:none;
+    margin-top:12px;
+    padding-top:12px;
+    border-top:1px solid var(--border);
+  }
+  .message-card.expanded .expanded-content{display:block;}
+  .message-text{
+    white-space:pre-wrap;
+    font-size:12.5px;
+    line-height:1.6;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:7px;
+    padding:10px 12px;
+    color:var(--text);
+  }
+  .var-mark{color:var(--blue);font-weight:500;}
+  .variables-section{margin-top:10px;}
+  .variables-title{
+    font-family:'Syne',sans-serif;
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    color:var(--muted);
+    margin:0 0 7px 0;
+  }
+  .variable-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:6px;
+  }
+  .variable-row label{
+    font-size:11px;
+    color:var(--blue);
+    width:44px;
+    flex-shrink:0;
+  }
+  .variable-input{
+    flex:1;
+    background:var(--bg);
+    border:1px solid var(--border);
+    color:var(--text);
+    font-family:'DM Mono',monospace;
+    font-size:12px;
+    padding:7px 9px;
+    border-radius:6px;
+    outline:none;
+  }
+  .variable-input:focus{border-color:var(--blue);}
+  .expanded-footer{
+    display:flex;
+    justify-content:flex-end;
+    gap:8px;
+    margin-top:12px;
+  }
+
+  .no-results{
+    text-align:center;
+    padding:80px 20px;
+    color:var(--muted);
+    font-size:13px;
+  }
+  .no-results .big{
+    font-family:'Syne',sans-serif;
+    font-size:16px;
+    color:var(--text);
+    margin-bottom:6px;
+  }
+</style>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="brand">
+      <h1>Variable<span class="dot">.</span>MessageBank</h1>
+      <p id="totalCount">— messages</p>
+    </div>
+    <div class="tag-list" id="tagList">
+      <div class="tag-list-label">Tags</div>
+    </div>
+    <div class="sidebar-footer">
+      <span>Showing <b id="shownCount">0</b></span>
+      <span id="activeFilterLabel"></span>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchInput" placeholder="Search messages, tags, summaries…">
+        <span class="kbd">/</span>
+      </div>
+      <button class="clear-filter" id="clearFilterBtn">Clear tag ✕</button>
+      <span class="result-count" id="resultCount"></span>
+    </div>
+    <div class="grid-scroll">
+      <div class="messages-grid" id="messagesGrid"></div>
+      <div class="no-results" id="noResults" style="display:none;">
+        <div class="big">No matches</div>
+        Try a different search term or clear the active tag filter.
+      </div>
+    </div>
+  </main>
+
+<script>
+const sampleMessages = [
+  {
+    "name": "Make an App Prompt",
+    "summary": "An AI prompt preconfigured for personal preference",
+    "tags": ["AI Prompt", "Programming"],
+    "copyable-message": "Create a minimalistic darkmode HTML app, with V_1 accent colours, with the purpose of V_2"
+  },
+  {
+    "name": "Professional Email Template",
+    "summary": "Formal business email for client communication",
+    "tags": ["Email", "Business", "Communication"],
+    "copyable-message": "Dear V_1, V_2"
+  },
+  {
+    "name": "Code Review Request",
+    "summary": "Template for requesting code reviews from team members",
+    "tags": ["Programming", "Code Review", "Team"],
+    "copyable-message": "Hi V_1,\n\nCould you please review my V_2 implementation? The main changes include V_3. I'm particularly concerned about V_4 and would appreciate your feedback.\n\nPR link: V_5\n\nThanks!"
+  }
+];
+
+const TAG_COLORS = ['#ffa238','#6babff','#60bc1b','#e069ff','#ff6b6b','#38d9d9','#f2c94c','#a78bfa'];
+
+let messages = [];
+let filtered = [];
+let tagColorMap = {};
+let activeTag = '';
+let searchTerm = '';
+let expandedId = null;
+let searchDebounce = null;
+
+async function init(){
+  try{
+    const res = await fetch('Assets/messages.json');
+    if(res.ok){ messages = await res.json(); }
+    else throw new Error('no file');
+  }catch(e){
+    messages = sampleMessages;
+  }
+  messages = messages.map((m,i)=>({...m,id:i,_varCache:null}));
+  buildTagColors();
+  document.getElementById('totalCount').textContent = messages.length + ' messages';
+  filtered = messages;
+  renderTagList();
+  applyFilters();
+  setupEvents();
+}
+
+function buildTagColors(){
+  const allTags = new Set();
+  messages.forEach(m=>{ if(Array.isArray(m.tags)) m.tags.forEach(t=>allTags.add(t)); });
+  [...allTags].sort().forEach((t,i)=>{ tagColorMap[t] = TAG_COLORS[i % TAG_COLORS.length]; });
+}
+
+function renderTagList(){
+  const counts = {};
+  messages.forEach(m=>{ if(Array.isArray(m.tags)) m.tags.forEach(t=> counts[t]=(counts[t]||0)+1); });
+  const tags = Object.keys(counts).sort();
+  const list = document.getElementById('tagList');
+  const frag = document.createDocumentFragment();
+  const label = document.createElement('div');
+  label.className='tag-list-label';
+  label.textContent='Tags';
+  frag.appendChild(label);
+  tags.forEach(tag=>{
+    const btn = document.createElement('button');
+    btn.className = 'tag-item' + (activeTag===tag ? ' active':'');
+    btn.dataset.tag = tag;
+    btn.innerHTML = `<span class="tag-swatch" style="background:${tagColorMap[tag]}"></span><span class="tag-name">${escapeHtml(tag)}</span><span class="tag-count">${counts[tag]}</span>`;
+    frag.appendChild(btn);
+  });
+  list.innerHTML='';
+  list.appendChild(frag);
+}
+
+function extractVariables(text){
+  const matches = text.match(/V_\d+/g);
+  return matches ? [...new Set(matches)].sort((a,b)=>{
+    return parseInt(a.split('_')[1]) - parseInt(b.split('_')[1]);
+  }) : [];
+}
+
+function highlightVars(text){
+  return escapeHtml(text).replace(/V_\d+/g, m => `<span class="var-mark">${m}</span>`);
+}
+
+function escapeHtml(s){
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function applyFilters(){
+  const term = searchTerm.trim().toLowerCase();
+  filtered = messages.filter(m=>{
+    const matchesTag = !activeTag || (Array.isArray(m.tags) && m.tags.includes(activeTag));
+    if(!matchesTag) return false;
+    if(!term) return true;
+    if(m.name.toLowerCase().includes(term)) return true;
+    if(m.summary.toLowerCase().includes(term)) return true;
+    if(Array.isArray(m.tags) && m.tags.some(t=>t.toLowerCase().includes(term))) return true;
+    return false;
+  });
+  document.getElementById('resultCount').innerHTML = `<b>${filtered.length}</b> / ${messages.length}`;
+  document.getElementById('shownCount').textContent = filtered.length;
+  document.getElementById('clearFilterBtn').classList.toggle('visible', !!activeTag);
+  render();
+}
+
+function render(){
+  const grid = document.getElementById('messagesGrid');
+  const noResults = document.getElementById('noResults');
+
+  if(filtered.length===0){
+    grid.innerHTML='';
+    noResults.style.display='block';
+    return;
+  }
+  noResults.style.display='none';
+
+  const frag = document.createDocumentFragment();
+  filtered.forEach(msg=>{
+    const card = buildCard(msg);
+    frag.appendChild(card);
+  });
+  grid.innerHTML='';
+  grid.appendChild(frag);
+}
+
+function buildCard(msg){
+  const isExpanded = msg.id === expandedId;
+  const card = document.createElement('div');
+  card.className = 'message-card' + (isExpanded ? ' expanded':'');
+  card.dataset.id = msg.id;
+
+  const tagsHtml = (Array.isArray(msg.tags) ? msg.tags : []).map(t=>
+    `<span class="tag-chip" style="color:${tagColorMap[t]};border-color:${tagColorMap[t]}44;background:${tagColorMap[t]}14">${escapeHtml(t)}</span>`
+  ).join('');
+
+  card.innerHTML = `
+    <div class="card-header">
+      <div>
+        <h3 class="card-title">${escapeHtml(msg.name)}</h3>
+        <p class="card-summary">${escapeHtml(msg.summary)}</p>
+      </div>
+      <button class="copy-btn" data-action="copy" data-id="${msg.id}">Copy</button>
+    </div>
+    <div class="tags-row">${tagsHtml}</div>
+    <div class="expanded-content"></div>
+  `;
+
+  if(isExpanded){
+    const expandedContent = card.querySelector('.expanded-content');
+    expandedContent.appendChild(buildExpandedContent(msg));
+  }
+
+  return card;
+}
+
+function buildExpandedContent(msg){
+  const variables = extractVariables(msg['copyable-message']);
+  const wrap = document.createElement('div');
+
+  const preview = document.createElement('div');
+  preview.className = 'message-text';
+  preview.id = `preview-${msg.id}`;
+  preview.innerHTML = highlightVars(msg['copyable-message']);
+  wrap.appendChild(preview);
+
+  if(variables.length){
+    const varSection = document.createElement('div');
+    varSection.className = 'variables-section';
+    varSection.innerHTML = `<div class="variables-title">Variables</div>`;
+    variables.forEach(v=>{
+      const row = document.createElement('div');
+      row.className = 'variable-row';
+      row.innerHTML = `<label>${v}</label><input type="text" class="variable-input" data-var="${v}" data-id="${msg.id}" placeholder="value…">`;
+      varSection.appendChild(row);
+    });
+    wrap.appendChild(varSection);
+  }
+
+  const footer = document.createElement('div');
+  footer.className = 'expanded-footer';
+  footer.innerHTML = `<button class="copy-btn" data-action="copy" data-id="${msg.id}">Copy message</button>`;
+  wrap.appendChild(footer);
+
+  return wrap;
+}
+
+function currentVarValues(msgId){
+  const inputs = document.querySelectorAll(`.variable-input[data-id="${msgId}"]`);
+  const vals = {};
+  inputs.forEach(inp=>{ vals[inp.dataset.var] = inp.value; });
+  return vals;
+}
+
+function resolvedText(msg){
+  let text = msg['copyable-message'];
+  if(msg.id === expandedId){
+    const vals = currentVarValues(msg.id);
+    Object.keys(vals).forEach(v=>{
+      if(vals[v].trim()) text = text.split(v).join(vals[v].trim());
+    });
+  }
+  return text;
+}
+
+function updatePreview(msgId){
+  const msg = messages.find(m=>m.id===msgId);
+  if(!msg) return;
+  const preview = document.getElementById(`preview-${msgId}`);
+  if(preview) preview.innerHTML = highlightVars(resolvedText(msg));
+}
+
+async function copyMessage(msgId, btn){
+  const msg = messages.find(m=>m.id===msgId);
+  if(!msg) return;
+  const text = resolvedText(msg);
+  try{
+    await navigator.clipboard.writeText(text);
+  }catch(e){
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  }
+  const original = btn.textContent;
+  btn.textContent = 'Copied!';
+  btn.classList.add('copied');
+  setTimeout(()=>{ btn.textContent = original; btn.classList.remove('copied'); }, 1300);
+}
+
+function toggleExpand(msgId){
+  expandedId = (expandedId === msgId) ? null : msgId;
+  render();
+}
+
+function setupEvents(){
+  const searchInput = document.getElementById('searchInput');
+  searchInput.addEventListener('input', e=>{
+    clearTimeout(searchDebounce);
+    const val = e.target.value;
+    searchDebounce = setTimeout(()=>{ searchTerm = val; applyFilters(); }, 120);
+  });
+
+  document.addEventListener('keydown', e=>{
+    if(e.key === '/' && document.activeElement !== searchInput){
+      e.preventDefault();
+      searchInput.focus();
+    }
+    if(e.key === 'Escape' && document.activeElement === searchInput){
+      searchInput.blur();
+    }
+  });
+
+  document.getElementById('tagList').addEventListener('click', e=>{
+    const btn = e.target.closest('.tag-item');
+    if(!btn) return;
+    const tag = btn.dataset.tag;
+    activeTag = (activeTag === tag) ? '' : tag;
+    renderTagList();
+    applyFilters();
+  });
+
+  document.getElementById('clearFilterBtn').addEventListener('click', ()=>{
+    activeTag = '';
+    renderTagList();
+    applyFilters();
+  });
+
+  document.getElementById('messagesGrid').addEventListener('click', e=>{
+    const copyBtn = e.target.closest('[data-action="copy"]');
+    if(copyBtn){
+      e.stopPropagation();
+      copyMessage(parseInt(copyBtn.dataset.id), copyBtn);
+      return;
+    }
+    if(e.target.classList.contains('variable-input')) return;
+    const card = e.target.closest('.message-card');
+    if(card) toggleExpand(parseInt(card.dataset.id));
+  });
+
+  document.getElementById('messagesGrid').addEventListener('input', e=>{
+    if(e.target.classList.contains('variable-input')){
+      updatePreview(parseInt(e.target.dataset.id));
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
