@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Refund Email Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #0b0e14;
+            color: #e4e7ed;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        .app {
+            max-width: 880px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 1.7rem;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .subtitle {
+            color: #8b95a9;
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+            border-left: 3px solid #2d7aff;
+            padding-left: 1rem;
+        }
+
+        .card {
+            background: #141a24;
+            border-radius: 20px;
+            padding: 1.75rem 1.5rem;
+            margin-bottom: 1.75rem;
+            border: 1px solid #252e3e;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+        }
+
+        .card-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: #8b95a9;
+            margin-bottom: 1.25rem;
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.25rem 2rem;
+        }
+
+        .field-group {
+            flex: 1 1 200px;
+            min-width: 160px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #b0bacf;
+            margin-bottom: 0.3rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            background: #1f2937;
+            border: 1px solid #2f3b4e;
+            border-radius: 12px;
+            padding: 0.65rem 0.9rem;
+            color: #f0f4fe;
+            font-size: 0.95rem;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #2d7aff;
+            box-shadow: 0 0 0 3px rgba(45, 122, 255, 0.2);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 200px;
+            line-height: 1.6;
+            font-size: 0.93rem;
+        }
+
+        .template-badge {
+            display: inline-block;
+            background: #1f2a3a;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            color: #8b9bc0;
+            margin-left: 0.5rem;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .btn {
+            background: #1f2937;
+            border: 1px solid #2f3b4e;
+            padding: 0.7rem 1.6rem;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #e4e7ed;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: 0.15s;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: #2d7aff;
+            border-color: #2d7aff;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #1e6af0;
+            border-color: #1e6af0;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #3a465c;
+        }
+
+        .btn-outline:hover {
+            background: #1f2937;
+            border-color: #5b6b88;
+        }
+
+        .btn-success {
+            background: #1f8b4c;
+            border-color: #1f8b4c;
+            color: #fff;
+        }
+
+        .btn-success:hover {
+            background: #1a7a42;
+        }
+
+        .toast {
+            background: #1f2937;
+            border: 1px solid #3a465c;
+            padding: 0.75rem 1.5rem;
+            border-radius: 60px;
+            font-size: 0.9rem;
+            color: #b8e2b8;
+            display: inline-block;
+            margin-top: 0.5rem;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        .flex-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.8rem 1.5rem;
+        }
+
+        .var-hint {
+            color: #8b95a9;
+            font-size: 0.75rem;
+            background: #1a212e;
+            padding: 0.25rem 0.8rem;
+            border-radius: 30px;
+            border: 1px solid #2a3446;
+        }
+
+        .var-hint code {
+            color: #7aa2f7;
+            font-family: monospace;
+            font-size: 0.8rem;
+        }
+
+        .footer {
+            text-align: center;
+            color: #4f5b70;
+            font-size: 0.8rem;
+            margin-top: 2rem;
+            border-top: 1px solid #1e2736;
+            padding-top: 1.8rem;
+        }
+
+        @media (max-width: 600px) {
+            .card {
+                padding: 1.25rem 1rem;
+            }
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            .flex-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <h1>✉️ Refund Request <span style="font-size:0.9rem;font-weight:400;color:#8b95a9;margin-left:auto;">UK consumer law</span></h1>
+    <div class="subtitle">Digital subscription · day 1 accidental payment</div>
+
+    <!-- Variables card -->
+    <div class="card">
+        <div class="card-title">📋 Personalise your email</div>
+        <div class="row">
+            <div class="field-group">
+                <label>Full name</label>
+                <input id="fullName" type="text" value="Alex Taylor" />
+            </div>
+            <div class="field-group">
+                <label>Email address</label>
+                <input id="userEmail" type="email" value="alex@example.com" />
+            </div>
+            <div class="field-group">
+                <label>Service name</label>
+                <input id="serviceName" type="text" value="StreamPlus Pro" />
+            </div>
+            <div class="field-group">
+                <label>Date of payment</label>
+                <input id="paymentDate" type="date" />
+            </div>
+        </div>
+        <div class="row" style="margin-top:0.8rem;">
+            <div class="field-group">
+                <label>Amount (GBP)</label>
+                <input id="amount" type="text" value="£9.99" />
+            </div>
+            <div class="field-group">
+                <label>Subscription period</label>
+                <select id="period">
+                    <option value="monthly">Monthly</option>
+                    <option value="annual">Annual</option>
+                    <option value="weekly">Weekly</option>
+                </select>
+            </div>
+            <div class="field-group">
+                <label>Template style</label>
+                <select id="templateSelect">
+                    <option value="standard">Standard (firm)</option>
+                    <option value="polite">Polite &amp; concise</option>
+                    <option value="detailed">Detailed (with legal refs)</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom text + email preview -->
+    <div class="card">
+        <div class="card-title">✏️ Custom text &amp; preview</div>
+        <div style="margin-bottom:0.7rem;display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;">
+            <span class="var-hint"><code>{name}</code> <code>{service}</code> <code>{date}</code> <code>{amount}</code> <code>{period}</code></span>
+            <span style="color:#5f6d87;font-size:0.8rem;">— insert variables anywhere</span>
+        </div>
+        <textarea id="customText" placeholder="Add extra context (e.g. 'I accidentally clicked renew' or 'I did not access the service')">I realised immediately that I did not intend to renew and I have not accessed any content since the payment.</textarea>
+    </div>
+
+    <!-- Email preview card -->
+    <div class="card" style="border-color:#1f3a5a;">
+        <div class="card-title" style="display:flex;justify-content:space-between;flex-wrap:wrap;">
+            <span>📧 Email preview</span>
+            <span style="font-weight:400;color:#6a7b98;font-size:0.75rem;text-transform:none;">generated from template + variables</span>
+        </div>
+        <div style="background:#0d121c;border-radius:16px;padding:1.2rem 1.2rem;border:1px solid #1e2a3a;white-space:pre-wrap;font-size:0.9rem;line-height:1.7;max-height:360px;overflow-y:auto;" id="previewArea">
+            Loading preview…
+        </div>
+        <div class="flex-row" style="margin-top:1.2rem;">
+            <button class="btn btn-primary" id="copyBtn">📋 Copy to clipboard</button>
+            <button class="btn btn-success" id="emailBtn">📧 Open in email app</button>
+            <button class="btn btn-outline" id="resetBtn">↺ Reset to default</button>
+        </div>
+        <div id="toastMessage" class="toast">✓ Copied to clipboard</div>
+    </div>
+
+    <div class="footer">
+        UK Consumer Contracts Regulations · 14-day cooling-off · digital content waiver
+    </div>
+</div>
+
+<script>
+    (function() {
+        // DOM refs
+        const fullName = document.getElementById('fullName');
+        const userEmail = document.getElementById('userEmail');
+        const serviceName = document.getElementById('serviceName');
+        const paymentDate = document.getElementById('paymentDate');
+        const amount = document.getElementById('amount');
+        const period = document.getElementById('period');
+        const templateSelect = document.getElementById('templateSelect');
+        const customText = document.getElementById('customText');
+        const previewArea = document.getElementById('previewArea');
+        const copyBtn = document.getElementById('copyBtn');
+        const emailBtn = document.getElementById('emailBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const toast = document.getElementById('toastMessage');
+
+        // Set default date to today
+        const today = new Date().toISOString().split('T')[0];
+        paymentDate.value = today;
+
+        // ----- templates (with placeholders) -----
+        const templates = {
+            standard: `Subject: Refund request for {service} subscription – accidental payment
+
+Dear {service} Support,
+
+I am writing to request a full refund for the {period} subscription to "{service}" that was charged to my account on {date} for the amount of {amount}.
+
+I did not intend to renew this subscription – it was an accidental payment made on day 1. I have not accessed any digital content or services since this charge was applied.
+
+Under UK consumer law (Consumer Contracts Regulations 2013), I am exercising my right to cancel within the 14-day cooling-off period. I note that if I had consented to immediate access and used the service, my right may be affected; however, in this case I have not used the service.
+
+{custom}
+
+Please confirm that you have processed this refund. My payment details are on file.
+
+Yours sincerely,
+{name}
+{email}`,
+
+            polite: `Subject: Request for refund – {service} subscription
+
+Dear {service} Team,
+
+I hope you're having a good day.
+
+I'm writing because I accidentally renewed my {period} subscription to "{service}" today ({date}) and was charged {amount}. It was a genuine mistake – I did not mean to continue.
+
+I have not used the service at all since the payment went through.
+
+I believe I am entitled to a refund under the UK 14-day cooling-off rule for digital services, especially since I haven't accessed any content.
+
+{custom}
+
+I would be very grateful if you could process this refund. Please let me know if you need any further details.
+
+Best regards,
+{name}
+{email}`,
+
+            detailed: `Subject: Formal refund request – {service} subscription (Consumer Rights)
+
+To the {service} Billing Department,
+
+I am formally requesting a refund of {amount} for the {period} subscription to "{service}" that was inadvertently renewed on {date}.
+
+This payment was made in error and I have not accessed, downloaded, or streamed any content from your platform following this transaction. As such, I assert my rights under the Consumer Contracts (Information, Cancellation and Additional Charges) Regulations 2013, which provide a 14-day cancellation period for distance contracts.
+
+I acknowledge that if I had explicitly consented to immediate performance of the digital content and waived my right to cancel, this might affect my position. However, no such waiver applies here as I have not consumed the service.
+
+{custom}
+
+I kindly request that you refund the full amount to the original payment method within 14 days as required by law.
+
+Thank you for your prompt attention.
+
+Yours faithfully,
+{name}
+{email}`
+        };
+
+        // ---- helper: replace placeholders ----
+        function buildEmail() {
+            const name = fullName.value.trim() || 'Your name';
+            const email = userEmail.value.trim() || 'your@email.com';
+            const service = serviceName.value.trim() || 'Service';
+            const date = paymentDate.value || new Date().toISOString().split('T')[0];
+            const amt = amount.value.trim() || '£0.00';
+            const per = period.value;
+            const custom = customText.value.trim() || '';
+
+            // format date a bit nicer
+            let displayDate = date;
+            if (date) {
+                try {
+                    const d = new Date(date + 'T00:00:00');
+                    if (!isNaN(d)) {
+                        displayDate = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+                    }
+                } catch (_) { /* ignore */ }
+            }
+
+            let templateKey = templateSelect.value;
+            let template = templates[templateKey] || templates.standard;
+
+            let body = template
+                .replace(/\{name\}/g, name)
+                .replace(/\{email\}/g, email)
+                .replace(/\{service\}/g, service)
+                .replace(/\{date\}/g, displayDate)
+                .replace(/\{amount\}/g, amt)
+                .replace(/\{period\}/g, per)
+                .replace(/\{custom\}/g, custom);
+
+            // clean up extra blank lines if custom is empty
+            if (!custom) {
+                body = body.replace(/\n\{\n?custom\n?\}\n?/g, '');
+                body = body.replace(/\n\{custom\}/g, '');
+            }
+
+            return body;
+        }
+
+        // ---- update preview ----
+        function updatePreview() {
+            previewArea.textContent = buildEmail();
+        }
+
+        // ---- copy to clipboard ----
+        function copyEmail() {
+            const text = buildEmail();
+            navigator.clipboard.writeText(text).then(() => {
+                toast.textContent = '✓ Copied to clipboard';
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 2000);
+            }).catch(() => {
+                // fallback
+                const area = document.createElement('textarea');
+                area.value = text;
+                document.body.appendChild(area);
+                area.select();
+                document.execCommand('copy');
+                area.remove();
+                toast.textContent = '✓ Copied (fallback)';
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 2000);
+            });
+        }
+
+        // ---- open in default email app (mailto) ----
+        function openEmailApp() {
+            const body = buildEmail();
+            // extract subject from first line if present
+            let subject = 'Refund request';
+            const lines = body.split('\n');
+            for (let line of lines) {
+                const trimmed = line.trim();
+                if (trimmed.toLowerCase().startsWith('subject:')) {
+                    subject = trimmed.replace(/^subject:\s*/i, '').trim();
+                    break;
+                }
+            }
+            // encode
+            const encodedBody = encodeURIComponent(body);
+            const mailto = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodedBody}`;
+            window.location.href = mailto;
+        }
+
+        // ---- reset to defaults ----
+        function resetDefaults() {
+            fullName.value = 'Alex Taylor';
+            userEmail.value = 'alex@example.com';
+            serviceName.value = 'StreamPlus Pro';
+            paymentDate.value = today;
+            amount.value = '£9.99';
+            period.value = 'monthly';
+            templateSelect.value = 'standard';
+            customText.value = 'I realised immediately that I did not intend to renew and I have not accessed any content since the payment.';
+            updatePreview();
+        }
+
+        // ---- event listeners ----
+        const inputs = [fullName, userEmail, serviceName, paymentDate, amount, period, templateSelect, customText];
+        inputs.forEach(el => el.addEventListener('input', updatePreview));
+        inputs.forEach(el => el.addEventListener('change', updatePreview));
+
+        copyBtn.addEventListener('click', copyEmail);
+        emailBtn.addEventListener('click', openEmailApp);
+        resetBtn.addEventListener('click', resetDefaults);
+
+        // initial preview
+        updatePreview();
+
+        // toast auto-hide
+        let toastTimeout;
+        const origShow = toast.classList.add.bind(toast.classList);
+        toast.classList.add = function(cls) {
+            if (cls === 'show') {
+                clearTimeout(toastTimeout);
+                origShow(cls);
+                toastTimeout = setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 2500);
+            } else {
+                origShow(cls);
+            }
+        };
+    })();
+</script>
+</body>
+</html>
