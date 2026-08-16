@@ -3,12 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Variable Message Bank</title>
+<title>Message Bank</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root{
+  /* Scoped to .msgbank-app so this never leaks into a parent page (e.g. a hub
+     that injects this HTML into its own DOM). No html/body rules, no vh-based
+     sizing that assumes we own the full browser viewport. */
+
+  .msgbank-app{
     --bg:#131313;
     --surface:#1a1a1a;
     --surface-2:#202020;
@@ -19,58 +23,60 @@
     --blue:#6babff;
     --green:#60bc1b;
     --radius:10px;
-  }
-  *{box-sizing:border-box;}
-  html,body{height:100%;}
-  body{
-    margin:0;
+
+    box-sizing:border-box;
+    display:flex;
+    min-height:80vh;         /* sane fallback when embedded; not a hard 100vh */
+    height:100%;              /* fills parent if parent has an explicit height */
     background:var(--bg);
     color:var(--text);
     font-family:'DM Mono', monospace;
-    display:flex;
-    overflow:hidden;
+    border-radius:var(--radius);
+    overflow:hidden;          /* clip to the card, not to the whole page */
+    isolation:isolate;        /* keep our stacking context self-contained */
   }
-  ::selection{background:var(--orange);color:#131313;}
-  ::-webkit-scrollbar{width:10px;height:10px;}
-  ::-webkit-scrollbar-track{background:transparent;}
-  ::-webkit-scrollbar-thumb{background:#2f2f2f;border-radius:8px;}
-  ::-webkit-scrollbar-thumb:hover{background:#3c3c3c;}
+  .msgbank-app *{box-sizing:border-box;}
+  .msgbank-app ::selection{background:var(--orange);color:#131313;}
+  .msgbank-app ::-webkit-scrollbar{width:10px;height:10px;}
+  .msgbank-app ::-webkit-scrollbar-track{background:transparent;}
+  .msgbank-app ::-webkit-scrollbar-thumb{background:#2f2f2f;border-radius:8px;}
+  .msgbank-app ::-webkit-scrollbar-thumb:hover{background:#3c3c3c;}
 
   /* ---------- Sidebar ---------- */
-  .sidebar{
+  .msgbank-app .sidebar{
     width:250px;
     min-width:250px;
-    height:100vh;
+    height:100%;
     background:var(--surface);
     border-right:1px solid var(--border);
     display:flex;
     flex-direction:column;
     padding:22px 0 0 0;
   }
-  .brand{
+  .msgbank-app .brand{
     padding:0 20px 18px 20px;
     border-bottom:1px solid var(--border);
   }
-  .brand h1{
+  .msgbank-app .brand h1{
     font-family:'Syne',sans-serif;
     font-weight:800;
     font-size:19px;
     margin:0 0 4px 0;
     letter-spacing:-0.02em;
   }
-  .brand h1 .dot{color:var(--orange);}
-  .brand p{
+  .msgbank-app .brand h1 .dot{color:var(--orange);}
+  .msgbank-app .brand p{
     margin:0;
     font-size:11px;
     color:var(--muted);
     letter-spacing:0.02em;
   }
-  .tag-list{
+  .msgbank-app .tag-list{
     flex:1;
     overflow-y:auto;
     padding:14px 10px 14px 10px;
   }
-  .tag-list-label{
+  .msgbank-app .tag-list-label{
     font-family:'Syne',sans-serif;
     font-size:10px;
     text-transform:uppercase;
@@ -78,7 +84,7 @@
     color:var(--muted);
     padding:6px 10px 8px 10px;
   }
-  .tag-item{
+  .msgbank-app .tag-item{
     display:flex;
     align-items:center;
     gap:9px;
@@ -94,16 +100,16 @@
     cursor:pointer;
     transition:background .12s ease;
   }
-  .tag-item:hover{background:var(--surface-2);}
-  .tag-item.active{background:var(--surface-2);}
-  .tag-item.active .tag-swatch{box-shadow:0 0 0 3px rgba(255,162,56,0.18);}
-  .tag-swatch{
+  .msgbank-app .tag-item:hover{background:var(--surface-2);}
+  .msgbank-app .tag-item.active{background:var(--surface-2);}
+  .msgbank-app .tag-item.active .tag-swatch{box-shadow:0 0 0 3px rgba(255,162,56,0.18);}
+  .msgbank-app .tag-swatch{
     width:8px;height:8px;border-radius:2px;flex-shrink:0;
   }
-  .tag-item .tag-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .tag-item .tag-count{color:var(--muted);font-size:11px;}
-  .tag-item.active .tag-count{color:var(--orange);}
-  .sidebar-footer{
+  .msgbank-app .tag-item .tag-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .msgbank-app .tag-item .tag-count{color:var(--muted);font-size:11px;}
+  .msgbank-app .tag-item.active .tag-count{color:var(--orange);}
+  .msgbank-app .sidebar-footer{
     padding:12px 20px;
     border-top:1px solid var(--border);
     font-size:11px;
@@ -111,17 +117,17 @@
     display:flex;
     justify-content:space-between;
   }
-  .sidebar-footer b{color:var(--text);}
+  .msgbank-app .sidebar-footer b{color:var(--text);}
 
   /* ---------- Main ---------- */
-  .main{
+  .msgbank-app .main{
     flex:1;
-    height:100vh;
+    height:100%;
     display:flex;
     flex-direction:column;
     min-width:0;
   }
-  .topbar{
+  .msgbank-app .topbar{
     padding:20px 28px 16px 28px;
     border-bottom:1px solid var(--border);
     display:flex;
@@ -129,16 +135,16 @@
     align-items:center;
     background:var(--bg);
   }
-  .search-wrap{
+  .msgbank-app .search-wrap{
     position:relative;
     flex:1;
     max-width:480px;
   }
-  .search-wrap svg{
+  .msgbank-app .search-wrap svg{
     position:absolute;left:13px;top:50%;transform:translateY(-50%);
     width:15px;height:15px;stroke:var(--muted);
   }
-  #searchInput{
+  .msgbank-app #searchInput{
     width:100%;
     background:var(--surface);
     border:1px solid var(--border);
@@ -150,22 +156,22 @@
     outline:none;
     transition:border-color .12s ease;
   }
-  #searchInput:focus{border-color:var(--orange);}
-  #searchInput::placeholder{color:var(--muted);}
-  .kbd{
+  .msgbank-app #searchInput:focus{border-color:var(--orange);}
+  .msgbank-app #searchInput::placeholder{color:var(--muted);}
+  .msgbank-app .kbd{
     position:absolute;right:10px;top:50%;transform:translateY(-50%);
     font-size:10px;color:var(--muted);
     border:1px solid var(--border);
     padding:2px 5px;border-radius:4px;
     pointer-events:none;
   }
-  .result-count{
+  .msgbank-app .result-count{
     font-size:12px;
     color:var(--muted);
     white-space:nowrap;
   }
-  .result-count b{color:var(--orange);}
-  .clear-filter{
+  .msgbank-app .result-count b{color:var(--orange);}
+  .msgbank-app .clear-filter{
     font-size:11px;
     color:var(--blue);
     background:none;
@@ -176,22 +182,22 @@
     display:none;
     font-family:'DM Mono',monospace;
   }
-  .clear-filter:hover{border-color:var(--blue);}
-  .clear-filter.visible{display:inline-block;}
+  .msgbank-app .clear-filter:hover{border-color:var(--blue);}
+  .msgbank-app .clear-filter.visible{display:inline-block;}
 
-  .grid-scroll{
+  .msgbank-app .grid-scroll{
     flex:1;
     overflow-y:auto;
     padding:20px 28px 60px 28px;
   }
-  .messages-grid{
+  .msgbank-app .messages-grid{
     display:grid;
     grid-template-columns:repeat(auto-fill, minmax(300px,1fr));
     gap:12px;
     align-items:start;
   }
 
-  .message-card{
+  .msgbank-app .message-card{
     background:var(--surface);
     border:1px solid var(--border);
     border-radius:var(--radius);
@@ -199,36 +205,39 @@
     cursor:pointer;
     transition:border-color .12s ease, transform .08s ease;
   }
-  .message-card:hover{border-color:#3a3a3a;}
-  .message-card.expanded{
+  .msgbank-app .message-card:hover{border-color:#3a3a3a;}
+  .msgbank-app .message-card.expanded{
     grid-column: span 2;
     border-color:var(--orange);
     cursor:default;
   }
   @media (max-width:760px){
-    .message-card.expanded{grid-column:span 1;}
+    .msgbank-app .message-card.expanded{grid-column:span 1;}
+    .msgbank-app{flex-direction:column;}
+    .msgbank-app .sidebar{width:100%;min-width:0;height:auto;}
+    .msgbank-app .main{height:auto;}
   }
 
-  .card-header{
+  .msgbank-app .card-header{
     display:flex;
     justify-content:space-between;
     align-items:flex-start;
     gap:10px;
   }
-  .card-title{
+  .msgbank-app .card-title{
     font-family:'Syne',sans-serif;
     font-weight:700;
     font-size:14px;
     margin:0 0 4px 0;
     letter-spacing:-0.01em;
   }
-  .card-summary{
+  .msgbank-app .card-summary{
     margin:0;
     font-size:11.5px;
     color:var(--muted);
     line-height:1.45;
   }
-  .copy-btn{
+  .msgbank-app .copy-btn{
     flex-shrink:0;
     font-family:'DM Mono',monospace;
     font-size:11px;
@@ -240,16 +249,16 @@
     cursor:pointer;
     transition:background .12s ease, border-color .12s ease;
   }
-  .copy-btn:hover{border-color:var(--orange);color:var(--orange);}
-  .copy-btn.copied{background:var(--green);color:#0d0d0d;border-color:var(--green);}
+  .msgbank-app .copy-btn:hover{border-color:var(--orange);color:var(--orange);}
+  .msgbank-app .copy-btn.copied{background:var(--green);color:#0d0d0d;border-color:var(--green);}
 
-  .tags-row{
+  .msgbank-app .tags-row{
     display:flex;
     flex-wrap:wrap;
     gap:5px;
     margin-top:10px;
   }
-  .tag-chip{
+  .msgbank-app .tag-chip{
     font-size:10px;
     padding:3px 7px;
     border-radius:5px;
@@ -258,14 +267,14 @@
     border:1px solid rgba(255,162,56,0.2);
   }
 
-  .expanded-content{
+  .msgbank-app .expanded-content{
     display:none;
     margin-top:12px;
     padding-top:12px;
     border-top:1px solid var(--border);
   }
-  .message-card.expanded .expanded-content{display:block;}
-  .message-text{
+  .msgbank-app .message-card.expanded .expanded-content{display:block;}
+  .msgbank-app .message-text{
     white-space:pre-wrap;
     font-size:12.5px;
     line-height:1.6;
@@ -275,9 +284,9 @@
     padding:10px 12px;
     color:var(--text);
   }
-  .var-mark{color:var(--blue);font-weight:500;}
-  .variables-section{margin-top:10px;}
-  .variables-title{
+  .msgbank-app .var-mark{color:var(--blue);font-weight:500;}
+  .msgbank-app .variables-section{margin-top:10px;}
+  .msgbank-app .variables-title{
     font-family:'Syne',sans-serif;
     font-size:10px;
     text-transform:uppercase;
@@ -285,19 +294,19 @@
     color:var(--muted);
     margin:0 0 7px 0;
   }
-  .variable-row{
+  .msgbank-app .variable-row{
     display:flex;
     align-items:center;
     gap:8px;
     margin-bottom:6px;
   }
-  .variable-row label{
+  .msgbank-app .variable-row label{
     font-size:11px;
     color:var(--blue);
     width:44px;
     flex-shrink:0;
   }
-  .variable-input{
+  .msgbank-app .variable-input{
     flex:1;
     background:var(--bg);
     border:1px solid var(--border);
@@ -308,21 +317,21 @@
     border-radius:6px;
     outline:none;
   }
-  .variable-input:focus{border-color:var(--blue);}
-  .expanded-footer{
+  .msgbank-app .variable-input:focus{border-color:var(--blue);}
+  .msgbank-app .expanded-footer{
     display:flex;
     justify-content:flex-end;
     gap:8px;
     margin-top:12px;
   }
 
-  .no-results{
+  .msgbank-app .no-results{
     text-align:center;
     padding:80px 20px;
     color:var(--muted);
     font-size:13px;
   }
-  .no-results .big{
+  .msgbank-app .no-results .big{
     font-family:'Syne',sans-serif;
     font-size:16px;
     color:var(--text);
@@ -332,9 +341,10 @@
 </head>
 <body>
 
+<div class="msgbank-app">
   <aside class="sidebar">
     <div class="brand">
-      <h1>Variable<span class="dot">.</span>MessageBank</h1>
+      <h1>Message<span class="dot">.</span>Bank</h1>
       <p id="totalCount">— messages</p>
     </div>
     <div class="tag-list" id="tagList">
@@ -364,8 +374,10 @@
       </div>
     </div>
   </main>
+</div>
 
 <script>
+(function(){
 const sampleMessages = [
   {
     "name": "Make an App Prompt",
@@ -658,7 +670,15 @@ function setupEvents(){
   });
 }
 
-document.addEventListener('DOMContentLoaded', init);
+// Run immediately if the DOM is already ready (as it will be when this
+// script is executed by the hub via new Function() after injection),
+// otherwise wait for DOMContentLoaded (standalone open in a browser).
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+})();
 </script>
 </body>
 </html>
