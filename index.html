@@ -537,72 +537,49 @@
             backBtn.classList.remove('hidden');
 
             try {
-                // Attempt to fetch the HTML file
-                const response = await fetch(app.path);
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                let html = await response.text();
-
-                // Clean up the HTML to avoid conflicts
-                // Remove any existing styles that might conflict
-                // But preserve the content
-
-                // Inject the HTML into the container
-                // We need to execute scripts in the loaded HTML
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = html;
-
-                // Find all script tags in the loaded HTML
-                const scripts = tempDiv.querySelectorAll('script');
-                const scriptContents = [];
-                scripts.forEach(script => {
-                    if (script.textContent.trim()) {
-                        scriptContents.push(script.textContent);
+                // Load the template in its own iframe so it gets a real document
+                // lifecycle (DOMContentLoaded fires normally) and relative
+                // fetch()/asset paths resolve against the app's own folder, not the hub.
+                msgContent.innerHTML = '';
+                const iframe = document.createElement('iframe');
+                iframe.id = 'templateFrame';
+                iframe.setAttribute('title', app.name);
+                iframe.style.cssText = 'width:100%;border:0;display:block;min-height:200px;';
+            
+                const loadTimeout = setTimeout(() => {
+                    showToast(`⚠️ ${app.name} is taking a while to load`, 3000, true);
+                }, 8000);
+            
+                iframe.addEventListener('load', () => {
+                    clearTimeout(loadTimeout);
+                    try {
+                        // Auto-size the iframe to its content's height
+                        const doc = iframe.contentWindow.document;
+                        const resize = () => {
+                            iframe.style.height = doc.documentElement.scrollHeight + 'px';
+                        };
+                        resize();
+                        // Re-measure if the app's content changes height after load
+                        // (e.g. expanding a card)
+                        new iframe.contentWindow.ResizeObserver(resize).observe(doc.body);
+                    } catch (e) {
+                        // Cross-origin or other access issue — leave default height
+                        console.warn('Could not auto-size iframe:', e);
                     }
-                    script.remove();
+                    showToast(`✓ Loaded "${app.name}"`);
                 });
-
-                // Set the HTML (without script tags)
-                msgContent.innerHTML = tempDiv.innerHTML;
-
-                // Execute scripts in order
-                scriptContents.forEach(code => {
-                    try {
-                        const scriptEl = document.createElement('script');
-                        scriptEl.textContent = code;
-                        // Give it an identifiable marker so goBack() can clean it up
-                        scriptEl.setAttribute('data-app-script', 'true');
-                        document.body.appendChild(scriptEl);
-                    } catch (e) {
-                        console.warn('Script execution error:', e);
-                    }
+            
+                iframe.addEventListener('error', () => {
+                    clearTimeout(loadTimeout);
+                    msgContent.innerHTML = generateFallbackApp(app);
+                    showToast(`⚠️ Could not load ${app.file}`, 3000, true);
                 });
-
-                // Re-initialize any custom components
-                // If the loaded app exposes an init function, call it
-                if (window._messageAppInit) {
-                    try {
-                        window._messageAppInit();
-                    } catch (e) {
-                        console.warn('Init error:', e);
-                    }
-                }
-
-                // If the app has a specific initialization function name
-                if (window.initMessageApp) {
-                    try {
-                        window.initMessageApp();
-                    } catch (e) {
-                        console.warn('initMessageApp error:', e);
-                    }
-                }
-
-                showToast(`✓ Loaded "${app.name}"`);
-
+            
+                iframe.src = app.path;
+                msgContent.appendChild(iframe);
+            
             } catch (error) {
                 console.error('Failed to load app:', error);
-                // Show fallback content
                 msgContent.innerHTML = generateFallbackApp(app);
                 showToast(`⚠️ Could not load ${app.file}`, 3000, true);
             }
