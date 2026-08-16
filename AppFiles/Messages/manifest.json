@@ -1,6 +1,22 @@
 {
   "templates": [
     {
+      "id": "aicopybank",
+      "name": "AI CopyBank",
+      "description": "Ready-to-copy prompts for building, debugging, and designing with AI",
+      "icon": "🤖",
+      "file": "AICopyBank/index.html",
+      "tags": ["AI", "Prompts"]
+    },
+    {
+      "id": "brandinformationcopybank",
+      "name": "Brand Information Copybank",
+      "description": "Standardised brand guidelines and copy for quick reference",
+      "icon": "🎨",
+      "file": "BrandCopyBank/index.html",
+      "tags": ["Brand", "Guidelines"]
+    },
+    {
       "id": "refundrequest",
       "name": "Refund Request",
       "description": "UK Consumer Law refund template",
