@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 AI Prompts Copybank</title>
+    <style>
+    :root {
+        --bg-dark: #131313;
+        --bg-card: #1e1e1e;
+        --bg-card-hover: #2a2a2a;
+        --text-light: #E0E0E0;
+        --text-white: #FFFFFF;
+        --primary-accent: #ffa238;
+        --secondary-accent: #6babff;
+        --active-part-color: #ffa238;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        background-color: var(--bg-dark);
+        color: var(--text-light);
+        line-height: 1.6;
+        min-height: 100vh;
+        padding: 1rem;
+    }
+
+    .container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding: 1.5rem 0;
+    }
+
+    h1 {
+        color: var(--text-white);
+        font-size: clamp(1.75rem, 5vw, 2.5rem);
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+    }
+
+    .subtitle {
+        color: var(--primary-accent);
+        font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+    }
+
+    /* Search Bar */
+    .search-container {
+        margin-bottom: 2rem;
+        position: relative;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 1rem 1.25rem;
+        font-size: 1rem;
+        background-color: var(--bg-card);
+        color: var(--text-white);
+        border: 2px solid transparent;
+        border-radius: 12px;
+        outline: none;
+        transition: var(--transition);
+    }
+
+    .search-input:focus {
+        border-color: var(--primary-accent);
+        box-shadow: 0 0 0 4px rgba(255, 162, 56, 0.1);
+    }
+
+    .search-input::placeholder {
+        color: #666;
+    }
+
+
+    /* App Layout */
+    .app-layout {
+        display: flex;
+        min-height: calc(100vh - 2rem);
+        max-width: 1400px;
+        margin: 0 auto;
+        gap: 1.25rem;
+    }
+
+    /* Sidebar */
+    .sidebar {
+        width: 250px;
+        flex: 0 0 250px;
+        background: linear-gradient(180deg, var(--bg-card) 0%, #191919 100%);
+        border-radius: 16px;
+        padding: 1.25rem 0.85rem;
+        position: sticky;
+        top: 1rem;
+        height: calc(100vh - 2rem);
+        overflow-y: auto;
+        border: 1px solid #262626;
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+
+        /* Firefox scrollbar */
+        scrollbar-width: thin;
+        scrollbar-color: #3a3a3a transparent;
+    }
+
+    .sidebar::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .sidebar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb {
+        background-color: #3a3a3a;
+        border-radius: 10px;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb:hover {
+        background-color: #4a4a4a;
+    }
+
+    .sidebar-title {
+        color: var(--text-white);
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin: 0.15rem 0.5rem 0.85rem;
+        opacity: 0.5;
+    }
+
+    .part-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+
+    .part-nav-button {
+        width: 100%;
+        border: 0;
+        border-radius: 10px;
+        padding: 0.65rem 0.8rem 0.65rem 0.9rem;
+        background: transparent;
+        color: var(--text-light);
+        text-align: left;
+        cursor: pointer;
+        transition: var(--transition);
+        font-size: 0.85rem;
+        font-weight: 600;
+        position: relative;
+    }
+
+    /* accent bar as a pseudo-element instead of border, so it can animate in */
+    .part-nav-button::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 12%;
+        bottom: 12%;
+        width: 3px;
+        border-radius: 3px;
+        background: var(--part-color);
+        opacity: 0.35;
+        transition: var(--transition);
+    }
+
+    .part-nav-button:hover {
+        background: var(--bg-card-hover);
+        color: var(--text-white);
+        transform: translateX(2px);
+    }
+
+    .part-nav-button:hover::before {
+        opacity: 0.7;
+    }
+
+    .part-nav-button.active {
+        background: color-mix(in srgb, var(--part-color) 14%, var(--bg-card-hover));
+        color: var(--text-white);
+    }
+
+    .part-nav-button.active::before {
+        opacity: 1;
+        box-shadow: 0 0 8px var(--part-color);
+    }
+
+    .part-nav-number {
+        display: block;
+        font-size: 0.68rem;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        opacity: 0.5;
+        margin-bottom: 0.15rem;
+    }
+
+    .part-nav-button.active .part-nav-number {
+        color: var(--part-color);
+        opacity: 0.9;
+    }
+
+    .part-nav-description {
+        display: block;
+        font-size: 0.78rem;
+        font-weight: 500;
+        opacity: 0.75;
+        line-height: 1.35;
+    }
+
+    .main-area {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .mobile-part-select {
+        display: none;
+    }
+
+    /* Tablet: narrower sidebar instead of dropping it entirely */
+    @media (min-width: 801px) and (max-width: 1024px) {
+        .sidebar {
+            width: 200px;
+            flex: 0 0 200px;
+            padding: 1rem 0.65rem;
+        }
+
+        .part-nav-button {
+            padding: 0.55rem 0.65rem 0.55rem 0.75rem;
+        }
+    }
+
+    @media (max-width: 800px) {
+        .app-layout {
+            display: block;
+            min-height: auto;
+        }
+
+        .sidebar {
+            display: none;
+        }
+
+        .mobile-part-select {
+            display: block;
+            width: 100%;
+            margin-bottom: 1rem;
+            padding: 0.85rem 2.75rem 0.85rem 1rem;
+            background-color: var(--bg-card);
+            color: var(--text-white);
+            border: 2px solid #2c2c2c;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+            background-repeat: no-repeat;
+            background-position: right 0.9rem center;
+            background-size: 1.1rem;
+            transition: var(--transition);
+        }
+
+        .mobile-part-select:focus {
+            outline: none;
+            border-color: var(--active-part-color, var(--primary-accent));
+            box-shadow: 0 0 0 4px color-mix(in srgb, var(--active-part-color, var(--primary-accent)) 15%, transparent);
+        }
+
+        .main-area {
+            width: 100%;
+        }
+    }
+
+
+    /* Navigation Buttons */
+    .nav-buttons {
+        display: flex;
+        gap: 0.75rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .nav-button {
+        padding: 0.75rem 1.5rem;
+        background-color: var(--bg-card);
+        color: var(--text-white);
+        border: 2px solid var(--active-part-color, var(--primary-accent));
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 0.95rem;
+        font-weight: 600;
+        transition: var(--transition);
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .nav-button:hover {
+        background-color: var(--active-part-color, var(--primary-accent));
+        color: var(--bg-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px color-mix(in srgb, var(--active-part-color, var(--primary-accent)) 40%, transparent);
+    }
+
+    .nav-button:active {
+        transform: translateY(0);
+    }
+
+    .home-button {
+        border-color: var(--secondary-accent);
+    }
+
+    .home-button:hover {
+        background-color: var(--secondary-accent);
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background-color: var(--bg-card);
+        border-radius: 10px;
+        font-size: 0.9rem;
+        color: var(--active-part-color, var(--primary-accent));
+        border-left: 4px solid var(--active-part-color, var(--primary-accent));
+        transition: var(--transition);
+    }
+
+    .breadcrumb span {
+        opacity: 0.6;
+        margin: 0 0.5rem;
+    }
+
+    /* Content Area */
+    .content {
+        min-height: 200px;
+    }
+
+    .content-title {
+        color: var(--text-white);
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        border-left: 4px solid var(--active-part-color, var(--primary-accent));
+        padding-left: 0.75rem;
+        transition: var(--transition);
+    }
+
+    /* Grid Layout */
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1rem;
+    }
+
+    /* Card Styles */
+    .card {
+        background-color: var(--bg-card);
+        padding: 1.25rem;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: var(--transition);
+        border: 2px solid transparent;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: var(--card-accent, linear-gradient(to bottom, var(--primary-accent), var(--secondary-accent)));
+        opacity: 0;
+        transition: var(--transition);
+    }
+
+    .card:hover {
+        background-color: var(--bg-card-hover);
+        border-color: var(--card-accent, var(--primary-accent));
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px color-mix(in srgb, var(--card-accent, var(--primary-accent)) 30%, transparent);
+    }
+
+    .card:hover::before {
+        opacity: 1;
+    }
+
+    .card:active {
+        transform: translateY(-2px);
+    }
+
+    /* Top-level (Part) cards get a bold left accent bar always visible */
+    .part-card {
+        border-left: 4px solid var(--card-accent, var(--primary-accent));
+    }
+
+    .part-card .card-title {
+        color: var(--card-accent, var(--text-white));
+    }
+
+    .card-content {
+        width: 100%;
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-white);
+        margin-bottom: 0.25rem;
+    }
+
+    .card-description {
+        font-size: 0.9rem;
+        color: var(--text-light);
+        opacity: 0.8;
+    }
+
+    /* Emoji-led cards: big emoji up top, small label below */
+    .card.has-emoji .card-content,
+    .part-card.has-emoji .card-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 0.35rem;
+    }
+
+    .card-emoji {
+        font-size: 2.75rem;
+        line-height: 1;
+    }
+
+    .card-title-small {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-white);
+    }
+
+    .card-emoji-desc {
+        font-size: 2.75rem;
+        line-height: 1;
+    }
+
+    .card-title-small + .card-emoji-desc {
+        margin-top: 0.35rem;
+    }
+
+    .card-description-small {
+        font-size: 0.8rem;
+        color: var(--text-light);
+        opacity: 0.8;
+        text-align: center;
+    }
+
+    .part-card.has-emoji .card-title-small {
+        color: var(--card-accent, var(--text-white));
+    }
+
+    .card.has-emoji .card-description,
+    .part-card.has-emoji .card-description {
+        text-align: center;
+    }
+
+    /* Emoji-led nav/home buttons: big emoji, small label below */
+    .nav-button.has-emoji {
+        flex-direction: column;
+        gap: 0.15rem;
+        padding: 0.6rem 1.5rem;
+    }
+
+    .nav-button-emoji {
+        font-size: 1.6rem;
+        line-height: 1;
+    }
+
+    .nav-button-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    /* Text Card (Copyable) */
+    .text-card {
+        background: linear-gradient(135deg, var(--bg-card) 0%, #252525 100%);
+        padding: 1.25rem;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: var(--transition);
+        border: 2px solid transparent;
+        border-left: 4px solid var(--active-part-color, var(--secondary-accent));
+        position: relative;
+        overflow: hidden;
+    }
+
+    .text-card::after {
+        content: 'Click to copy';
+        position: absolute;
+        top: 0.5rem;
+        right: 0.75rem;
+        font-size: 0.75rem;
+        color: var(--active-part-color, var(--primary-accent));
+        opacity: 0;
+        transition: var(--transition);
+    }
+
+    .text-card:hover {
+        border-color: var(--active-part-color, var(--secondary-accent));
+        box-shadow: 0 8px 24px color-mix(in srgb, var(--active-part-color, var(--secondary-accent)) 25%, transparent);
+        transform: translateY(-4px);
+    }
+
+    .text-card:hover::after {
+        opacity: 1;
+    }
+
+    .text-card.copied {
+        animation: copyPulse 0.6s ease;
+    }
+
+    @keyframes copyPulse {
+        0%, 100% {
+            border-color: transparent;
+        }
+        50% {
+            border-color: var(--active-part-color, var(--secondary-accent));
+            box-shadow: 0 0 20px color-mix(in srgb, var(--active-part-color, var(--secondary-accent)) 50%, transparent);
+        }
+    }
+
+    .text-content {
+        font-size: 0.95rem;
+        color: var(--text-white);
+        word-wrap: break-word;
+        white-space: pre-wrap;
+    }
+
+    /* Search Results */
+    .search-results {
+        display: none;
+    }
+
+    .search-results.active {
+        display: block;
+    }
+
+    .search-result-item {
+        background-color: var(--bg-card);
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 0.75rem;
+        cursor: pointer;
+        transition: var(--transition);
+        border: 2px solid transparent;
+        border-left: 4px solid var(--result-accent, var(--primary-accent));
+    }
+
+    .search-result-item:hover {
+        background-color: var(--bg-card-hover);
+        border-color: var(--result-accent, var(--secondary-accent));
+        transform: translateX(8px);
+    }
+
+    .search-result-path {
+        font-size: 0.8rem;
+        color: var(--result-accent, var(--primary-accent));
+        margin-bottom: 0.5rem;
+    }
+
+    .search-result-text {
+        color: var(--text-white);
+        font-size: 0.95rem;
+    }
+
+    .no-results {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: var(--text-light);
+        opacity: 0.6;
+    }
+
+    /* Hidden */
+    .hidden {
+        display: none;
+    }
+
+    /* Fade Animation */
+    .fade-in {
+        animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 640px) {
+        body {
+            padding: 0.75rem;
+        }
+
+        .grid {
+            grid-template-columns: 1fr;
+        }
+
+        .nav-buttons {
+            flex-direction: column;
+        }
+
+        .nav-button {
+            width: 100%;
+        }
+    }
+
+    /* Copy Notification */
+    .copy-notification {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background-color: var(--secondary-accent);
+        color: var(--bg-dark);
+        padding: 1rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+        box-shadow: 0 8px 24px rgba(107, 171, 255, 0.4);
+        z-index: 1000;
+        animation: slideIn 0.3s ease, slideOut 0.3s ease 2.7s;
+        pointer-events: none;
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideOut {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(400px);
+            opacity: 0;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .copy-notification {
+            right: 1rem;
+            left: 1rem;
+            bottom: 1rem;
+        }
+    }
+</style>
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar" id="partSidebar">
+            <div class="sidebar-title">Prompt Categories</div>
+            <div class="part-nav" id="partNav"></div>
+        </aside>
+
+        <div class="main-area">
+            <header>
+                <h1>🤖 AI Prompts Copybank</h1>
+                <p class="subtitle">Copy ready-made prompts for building, debugging, designing & reviewing with AI</p>
+            </header>
+
+            <select class="mobile-part-select" id="mobilePartSelect" aria-label="Select prompt category"></select>
+
+            <div class="search-container">
+            <input 
+                type="text" 
+                class="search-input" 
+                id="searchInput" 
+                placeholder="Search prompts..."
+                autocomplete="off"
+            >
+        </div>
+
+        <div class="nav-buttons hidden" id="navButtons">
+            <button class="nav-button" id="backButton">← Back</button>
+            <button class="nav-button home-button" id="homeButton">🏠 Home</button>
+        </div>
+
+        <div class="breadcrumb hidden" id="breadcrumb"></div>
+
+        <main class="content">
+            <div id="mainContent" class="fade-in"></div>
+            <div id="searchResults" class="search-results"></div>
+        </main>
+        </div>
+    </div>
+
+    <script>
+    // FLEXIBLE DATA STRUCTURE
+    // Each item can have:
+    // - name: Display name
+    // - description: Optional description
+    // - children: Array of sub-items (optional)
+    // - texts: Array of copyable texts (optional)
+    // You can nest as deeply as you want and add texts at any level!
+
+    // Unique accent colour per top-level "Part" (category). Cycles if more categories than colours.
+    const partColors = [
+        '#ffa238', // Building Apps (orange, house accent)
+        '#6babff', // Debugging & Fixing (blue, house accent)
+        '#c792ff', // Image / SVG Generation (violet)
+        '#66ff78', // Message & Copy Review (green)
+        '#5cf4ff', // Prompt Engineering Meta (cyan)
+        '#ff9d5c', // Code Review & Refactor (amber)
+        '#ff6b8b'  // Planning & Specs (rose)
+    ];
+
+
+
+    const data = {
+  "items": [
+    {
+      "name": "Building",
+      "description": "🏗️ Building Apps",
+      "children": [
+        {
+          "name": "🆕 New App From Scratch",
+          "description": "",
+          "texts": [
+            {
+              "title": "🧱 Single-file HTML app spec",
+              "content": "Build a single-file, self-contained HTML app (HTML/CSS/JS all in one file, no build step) that does the following: [describe the app's purpose and core features]. Use a dark theme with a clear accent colour, mobile-responsive layout, and no external dependencies unless essential. Include sensible empty/loading states and keep the code well-commented so I can extend it later."
+            },
+            {
+              "title": " 🧩 Feature list first",
+              "content": "Before writing any code, give me a short bullet list of the core features you think this app needs, plus 2-3 optional \"nice to have\" features. Wait for my confirmation before you start building."
+            },
+            {
+              "title": " 📱 Mobile-first requirement",
+              "content": "Make sure this app is fully usable on a small mobile screen (assume a 375px wide viewport) as well as desktop. Use responsive breakpoints, touch-friendly tap targets (min 44px), and avoid hover-only interactions for anything essential."
+            }
+          ]
+        },
+        {
+          "name": "🔌 Adding a Feature",
+          "description": "",
+          "texts": [
+            {
+              "title": "🚨 Feature request",
+              "content": "I want to add the following feature to the existing app: [describe feature]. Please show me the full updated file(s), not just a snippet, and keep the existing styling and structure consistent with what's already there."
+            },
+            {
+              "title": " ✅ Confirm approach first",
+              "content": "Before writing code, briefly explain how you'd implement this feature and flag any parts of the existing code you'll need to change. Once I confirm, go ahead and build it."
+            }
+          ]
+        },
+        {
+          "name": "🎨 Design System Consistency",
+          "description": "",
+          "texts": [
+            {
+              "title": "🖌️ Apply my design system",
+              "content": "Use my existing design system for this app: dark background (#131313), orange (#ffa238) and blue (#6babff) accent colours, a display font for headings and a monospace font for labels/data. Keep all UI single-file, self-contained, and deployable to GitHub Pages with no build tools."
+            }
+          ]
+        },
+        {
+          "name": "💾 Data Persistence",
+          "description": "",
+          "texts": [
+            {
+              "title": "🗄️ Local storage / state",
+              "content": "Add persistence to this app so that data survives a page refresh. Use an appropriate in-browser storage approach for this environment, keep the data schema simple and documented in a comment, and include a way for the user to export/reset their data."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Debugging",
+      "description": "🐛 Debugging & Fixing",
+      "children": [
+        {
+          "name": "🔍 Diagnose a Bug",
+          "description": "",
+          "texts": [
+            {
+              "title": "🚨 Bug report",
+              "content": "I'm seeing the following bug: [describe what happens vs. what you expected]. Here's the relevant code / error message: [paste code or error]. Please identify the root cause before proposing a fix, and explain briefly why it's happening."
+            },
+            {
+              "title": " ✅ Minimal fix request",
+              "content": "Please give me the smallest possible fix for this bug without refactoring unrelated code. If a larger refactor would genuinely be better, mention it separately as an optional follow-up."
+            }
+          ]
+        },
+        {
+          "name": "🧪 Can't Reproduce",
+          "description": "",
+          "texts": [
+            {
+              "title": "🚨 Intermittent issue",
+              "content": "This bug only happens sometimes and I can't reliably reproduce it: [describe symptoms]. Suggest the most likely causes for this kind of intermittent behaviour, and tell me what logging or checks I should add to help pin it down."
+            }
+          ]
+        },
+        {
+          "name": "📋 Full Error Dump",
+          "description": "",
+          "texts": [
+            {
+              "title": "🚨 Paste the whole error",
+              "content": "Here is the full error message / stack trace / console output: [paste]. Please explain what it means in plain English, point to the likely line(s) of code responsible, and suggest a fix."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Images",
+      "description": "🖼️ Image / SVG Generation",
+      "children": [
+        {
+          "name": "🧊 Icon or Favicon",
+          "description": "",
+          "texts": [
+            {
+              "title": "🎨 Simple SVG icon",
+              "content": "Create a simple, clean SVG icon representing [subject]. Use a minimal number of shapes, a limited colour palette (2-3 colours matching my orange #ffa238 / blue #6babff accents), and make sure it reads clearly at small sizes (16px-32px)."
+            },
+            {
+              "title": " ✅ Favicon set",
+              "content": "Generate an SVG favicon for [app name/subject] that works well on both light and dark browser tabs, and give me the <link> tag markup to embed it directly as a data URI so I don't need a separate image file."
+            }
+          ]
+        },
+        {
+          "name": "🖥️ UI Illustration",
+          "description": "",
+          "texts": [
+            {
+              "title": "🖌️ Hero illustration",
+              "content": "Create an SVG illustration for [context, e.g. an empty state / hero banner] with a [describe style, e.g. flat, geometric, hand-drawn] look, using my dark theme (#131313 background) and orange/blue accent colours. Keep the file size reasonable and avoid overly complex paths."
+            }
+          ]
+        },
+        {
+          "name": "📊 Diagram / Flowchart",
+          "description": "",
+          "texts": [
+            {
+              "title": "🗺️ System/flow diagram",
+              "content": "Create an SVG diagram showing [process/flow/architecture]. Use clear labelled boxes/nodes, directional arrows, and a colour scheme consistent with my dark theme. Keep labels legible and the whole diagram viewable without zooming on a typical laptop screen."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Messages",
+      "description": "✍️ Message & Copy Review",
+      "children": [
+        {
+          "name": "🩹 Tone Check",
+          "description": "",
+          "texts": [
+            {
+              "title": "🚨 Review before sending",
+              "content": "Please review this message before I send it: [paste message]. Check the tone comes across as [desired tone, e.g. friendly but firm / professional / concise], flag anything that could be misread, and suggest an improved version."
+            }
+          ]
+        },
+        {
+          "name": "✂️ Tighten / Shorten",
+          "description": "",
+          "texts": [
+            {
+              "title": "🚨 Make it shorter",
+              "content": "Here's a message: [paste message]. Please tighten it up, cut anything unnecessary, and keep it under [word/character limit] while preserving the key point and a similar tone."
+            }
+          ]
+        },
+        {
+          "name": "🗣️ Difficult Conversation",
+          "description": "",
+          "texts": [
+            {
+              "title": "🚨 Sensitive message draft",
+              "content": "I need to send a message about [situation] which is a bit sensitive because [context]. Draft a version that is clear and direct but not confrontational, and give me one alternative phrasing for the trickiest part of the message."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Prompting",
+      "description": "🧠 Prompt Engineering Meta",
+      "children": [
+        {
+          "name": "🎯 Sharpen a Vague Prompt",
+          "description": "",
+          "texts": [
+            {
+              "title": "🚨 My prompt isn't working",
+              "content": "Here's a prompt I've been using that isn't giving me good results: [paste prompt]. Rewrite it to be clearer and more specific, and tell me what was ambiguous about the original."
+            }
+          ]
+        },
+        {
+          "name": "🧭 Ask for a Plan First",
+          "description": "",
+          "texts": [
+            {
+              "title": " ✅ Plan before acting",
+              "content": "Before doing the task, first restate your understanding of what I'm asking for and outline your plan in a few bullet points. Wait for me to confirm before proceeding."
+            }
+          ]
+        },
+        {
+          "name": "🔁 Iterate on Output",
+          "description": "",
+          "texts": [
+            {
+              "title": "🔄 Ask for alternatives",
+              "content": "Give me 3 different variations of this, each taking a noticeably different approach, and briefly note the trade-off of each one."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Refactor",
+      "description": "🔧 Code Review & Refactor",
+      "children": [
+        {
+          "name": "🧹 General Cleanup",
+          "description": "",
+          "texts": [
+            {
+              "title": "🚨 Review this code",
+              "content": "Please review this code for readability, naming, and structure: [paste code]. Point out anything confusing or risky, and suggest specific improvements without changing the overall behaviour."
+            }
+          ]
+        },
+        {
+          "name": "⚡ Performance Pass",
+          "description": "",
+          "texts": [
+            {
+              "title": "🚨 Optimise for performance",
+              "content": "Review this code for performance issues: [paste code]. Identify any unnecessary re-renders, expensive loops, or inefficient DOM operations, and suggest fixes with a brief explanation of the expected impact."
+            }
+          ]
+        },
+        {
+          "name": "📐 Consistency With Existing Style",
+          "description": "",
+          "texts": [
+            {
+              "title": "🚨 Match my conventions",
+              "content": "Refactor this code to match the conventions already used elsewhere in the file (naming style, indentation, comment style, function structure). Don't introduce new patterns unless necessary."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Planning",
+      "description": "🗒️ Planning & Specs",
+      "children": [
+        {
+          "name": "📝 Feature Spec",
+          "description": "",
+          "texts": [
+            {
+              "title": "🚨 Write a spec first",
+              "content": "Before building anything, write a short spec for [feature/app]: purpose, core user flow, key edge cases, and what's explicitly out of scope. Keep it to a few short paragraphs."
+            }
+          ]
+        },
+        {
+          "name": "🧱 Break Into Steps",
+          "description": "",
+          "texts": [
+            {
+              "title": "🚨 Step-by-step build order",
+              "content": "Break this project down into an ordered list of small, shippable steps, where each step results in something I can test. Don't write any code yet — just the step list."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+};
+
+
+        // STATE MANAGEMENT
+    let currentPath = [];
+    let allTexts = [];
+
+    // DOM ELEMENTS
+    const searchInput = document.getElementById('searchInput');
+    const mainContent = document.getElementById('mainContent');
+    const searchResults = document.getElementById('searchResults');
+    const navButtons = document.getElementById('navButtons');
+    const backButton = document.getElementById('backButton');
+    const homeButton = document.getElementById('homeButton');
+    const breadcrumb = document.getElementById('breadcrumb');
+    const partNav = document.getElementById('partNav');
+    const mobilePartSelect = document.getElementById('mobilePartSelect');
+
+    // Get colour for a top-level part index (cycles if more parts than colours defined)
+    function getPartColor(topIndex) {
+        return partColors[topIndex % partColors.length];
+    }
+
+    // Detect a leading emoji (incl. multi-codepoint / ZWJ sequences) on a string.
+    // Returns { emoji, rest } if found, otherwise null.
+    const EMOJI_PREFIX_RE = /^((?:\p{Extended_Pictographic}|\p{Emoji_Presentation})(?:\uFE0F|\u200D(?:\p{Extended_Pictographic}|\p{Emoji_Presentation}))*)\s*/u;
+
+    function parseEmojiPrefix(text) {
+        if (!text) return null;
+        const match = text.match(EMOJI_PREFIX_RE);
+        if (match && match[1]) {
+            const rest = text.slice(match[0].length).trim();
+            if (rest.length > 0) {
+                return { emoji: match[1], rest: rest };
+            }
+        }
+        return null;
+    }
+
+    // Build the inner HTML for a card's title area, using the big-emoji/small-text
+    // layout when the name and/or description starts with an emoji. Title and
+    // description are evaluated independently.
+    function renderCardTitleContent(name, description) {
+        const titleParsed = parseEmojiPrefix(name);
+        const descParsed = parseEmojiPrefix(description);
+
+        const titleHtml = titleParsed
+            ? `<div class="card-emoji">${titleParsed.emoji}</div><div class="card-title-small">${titleParsed.rest}</div>`
+            : `<div class="card-title">${name}</div>`;
+
+        let descHtml = '';
+        if (descParsed) {
+            descHtml = `<div class="card-emoji-desc">${descParsed.emoji}</div><div class="card-description-small">${descParsed.rest}</div>`;
+        } else if (description) {
+            descHtml = `<div class="card-description">${description}</div>`;
+        }
+
+        return {
+            isEmoji: Boolean(titleParsed || descParsed),
+            html: titleHtml + descHtml
+        };
+    }
+
+    // Build innerHTML for a nav button label, using big-emoji/small-text when applicable.
+    function renderButtonLabel(text) {
+        const parsed = parseEmojiPrefix(text);
+        if (parsed) {
+            return {
+                isEmoji: true,
+                html: `<span class="nav-button-emoji">${parsed.emoji}</span><span class="nav-button-label">${parsed.rest}</span>`
+            };
+        }
+        return { isEmoji: false, html: text };
+    }
+
+    // HELPER: Get current item based on path
+    function getCurrentItem() {
+        let current = { children: data.items };
+        for (let index of currentPath) {
+            current = current.children[index];
+        }
+        return current;
+    }
+
+
+    // Render the top-level Parts into the persistent sidebar.
+    function renderPartSidebar() {
+        partNav.innerHTML = data.items.map((part, index) => {
+            const parsed = parseEmojiPrefix(part.description || '');
+            const description = parsed ? `${parsed.emoji} ${parsed.rest}` : (part.description || '');
+            const isActive = currentPath.length > 0 && currentPath[0] === index;
+
+            return `
+                <button
+                    class="part-nav-button${isActive ? ' active' : ''}"
+                    style="--part-color: ${getPartColor(index)};"
+                    onclick="navigateToPart(${index})"
+                    title="${part.name} — ${description}">
+                    <span class="part-nav-number">${part.name}</span>
+                    <span>${description}</span>
+                </button>
+            `;
+        }).join('');
+
+        mobilePartSelect.innerHTML =
+            `<option value="">⌂ Home / All Categories</option>` +
+            data.items.map((part, index) => {
+                const parsed = parseEmojiPrefix(part.description || '');
+                const description = parsed ? `${parsed.emoji} ${parsed.rest}` : (part.description || '');
+                return `<option value="${index}">${part.name} — ${description}</option>`;
+            }).join('');
+
+        mobilePartSelect.value = currentPath.length > 0 ? String(currentPath[0]) : '';
+    }
+
+    function navigateToPart(index) {
+        searchInput.value = '';
+        searchResults.classList.remove('active');
+        mainContent.classList.remove('hidden');
+        currentPath = [index];
+        renderCurrentLevel();
+    }
+
+    // INITIALISATION
+    function init() {
+        indexAllTexts();
+        renderPartSidebar();
+        applyButtonLabel(backButton, '← Back');
+        applyButtonLabel(homeButton, '🏠 Home');
+        renderCurrentLevel();
+        attachEventListeners();
+    }
+
+    // Apply emoji-aware label markup to a button element
+    function applyButtonLabel(buttonEl, text) {
+        const label = renderButtonLabel(text);
+        buttonEl.innerHTML = label.html;
+        buttonEl.classList.toggle('has-emoji', label.isEmoji);
+    }
+
+    // Recursively index all texts for search, tagging each with its top-level part colour
+    function indexAllTexts() {
+        allTexts = [];
+
+        function traverse(items, path = [], topIndex = null) {
+            items.forEach((item, index) => {
+                const currentTopIndex = topIndex === null ? index : topIndex;
+                const currentPath = [...path, item.name];
+
+                // Add texts if they exist at this level
+                if (item.texts && item.texts.length > 0) {
+                    item.texts.forEach(text => {
+                        allTexts.push({
+                            path: currentPath,
+                            pathIndices: [...path.map((_, i) => i), index],
+                            title: text.title,
+                            content: text.content,
+                            color: getPartColor(currentTopIndex)
+                        });
+                    });
+                }
+
+                // Recurse into children if they exist
+                if (item.children && item.children.length > 0) {
+                    traverse(item.children, [...path, item.name], currentTopIndex);
+                }
+            });
+        }
+
+        traverse(data.items);
+    }
+
+    // EVENT LISTENERS
+    function attachEventListeners() {
+        searchInput.addEventListener('input', handleSearch);
+        backButton.addEventListener('click', goBack);
+        homeButton.addEventListener('click', goHome);
+        mobilePartSelect.addEventListener('change', (e) => {
+            if (e.target.value === '') {
+                goHome();
+            } else {
+                navigateToPart(Number(e.target.value));
+            }
+        });
+    }
+
+    // Update the --active-part-color CSS variable based on the current top-level part
+    function updateActivePartColor() {
+        if (currentPath.length === 0) {
+            document.documentElement.style.setProperty('--active-part-color', 'var(--primary-accent)');
+        } else {
+            document.documentElement.style.setProperty('--active-part-color', getPartColor(currentPath[0]));
+        }
+    }
+
+    // RENDER CURRENT LEVEL
+    function renderCurrentLevel() {
+        renderPartSidebar();
+        updateActivePartColor();
+        updateBreadcrumb();
+        updateNavButtons();
+
+        const currentItem = getCurrentItem();
+        const items = currentItem.children || [];
+        const texts = currentItem.texts || [];
+
+        let title = currentPath.length === 0 ? 'Select a Prompt Category' : currentItem.name;
+
+        let html = `<h2 class="content-title">${title}</h2>`;
+
+        // Show texts first if they exist at this level
+        if (texts.length > 0) {
+            html += '<div class="grid">';
+            texts.forEach((text, textIndex) => {
+                html += `
+                    <div class="text-card" onclick="copyTextAtCurrentLevel(${textIndex}, this)">
+                        <div class="card-content">
+                            <div class="card-title">${text.title}</div>
+                            <div class="text-content">${text.content}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+        }
+
+        // Show child items if they exist
+        if (items.length > 0) {
+            html += '<div class="grid">';
+            items.forEach((item, index) => {
+                const isTopLevel = currentPath.length === 0;
+                const accent = isTopLevel ? getPartColor(index) : `var(--active-part-color, var(--primary-accent))`;
+                const titleContent = renderCardTitleContent(item.name, item.description);
+                const cardClass = (isTopLevel ? 'card part-card' : 'card') + (titleContent.isEmoji ? ' has-emoji' : '');
+                html += `
+                    <div class="${cardClass}" style="--card-accent: ${accent};" onclick="navigateToIndex(${index})">
+                        <div class="card-content">
+                            ${titleContent.html}
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+        }
+
+        mainContent.innerHTML = html;
+    }
+
+    // NAVIGATION
+    function navigateToIndex(index) {
+        currentPath.push(index);
+        renderCurrentLevel();
+    }
+
+    function goBack() {
+        if (currentPath.length === 0) return;
+        currentPath.pop();
+        renderCurrentLevel();
+    }
+
+    function goHome() {
+        searchInput.value = '';
+        searchResults.classList.remove('active');
+        mainContent.classList.remove('hidden');
+        currentPath = [];
+        renderCurrentLevel();
+    }
+
+    // BREADCRUMB
+    function updateBreadcrumb() {
+        if (currentPath.length === 0) {
+            breadcrumb.classList.add('hidden');
+            return;
+        }
+
+        breadcrumb.classList.remove('hidden');
+        let pathNames = ['Home'];
+
+        let current = { children: data.items };
+        for (let index of currentPath) {
+            current = current.children[index];
+            pathNames.push(current.name);
+        }
+
+        breadcrumb.innerHTML = pathNames.join(' <span>›</span> ');
+    }
+
+    // NAV BUTTON VISIBILITY
+    function updateNavButtons() {
+        if (currentPath.length === 0) {
+            navButtons.classList.add('hidden');
+        } else {
+            navButtons.classList.remove('hidden');
+        }
+    }
+
+    // SEARCH
+    function handleSearch(e) {
+        const query = e.target.value.trim().toLowerCase();
+
+        if (query === '') {
+            searchResults.classList.remove('active');
+            mainContent.classList.remove('hidden');
+            return;
+        }
+
+        const results = allTexts.filter(item =>
+            item.title.toLowerCase().includes(query) ||
+            item.content.toLowerCase().includes(query)
+        );
+
+        mainContent.classList.add('hidden');
+        searchResults.classList.add('active');
+
+        if (results.length === 0) {
+            searchResults.innerHTML = '<div class="no-results">No results found</div>';
+        } else {
+            searchResults.innerHTML = `
+                <h2 class="content-title">Search Results (${results.length})</h2>
+                ${results.map((result, index) => `
+                    <div class="search-result-item" style="--result-accent: ${result.color};" onclick="copyTextFromSearch(${index}, this)">
+                        <div class="search-result-path">${result.path.join(' › ')} › ${result.title}</div>
+                        <div class="search-result-text">${result.content}</div>
+                    </div>
+                `).join('')}
+            `;
+        }
+    }
+
+    // COPY FUNCTIONS
+    function copyTextAtCurrentLevel(textIndex, element) {
+        const currentItem = getCurrentItem();
+        const text = currentItem.texts[textIndex];
+        copyToClipboard(text.content, element);
+    }
+
+    function copyTextFromSearch(resultIndex, element) {
+        const query = searchInput.value.trim().toLowerCase();
+        const results = allTexts.filter(item =>
+            item.title.toLowerCase().includes(query) ||
+            item.content.toLowerCase().includes(query)
+        );
+        copyToClipboard(results[resultIndex].content, element);
+    }
+
+    function copyToClipboard(text, element) {
+        navigator.clipboard.writeText(text).then(() => {
+            showCopyNotification();
+            element.classList.add('copied');
+            setTimeout(() => element.classList.remove('copied'), 600);
+        }).catch(err => {
+            console.error('Failed to copy:', err);
+        });
+    }
+
+    function showCopyNotification() {
+        const notification = document.createElement('div');
+        notification.className = 'copy-notification';
+        notification.textContent = '✓ Copied to clipboard!';
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
+
+    // START APP
+    init();
+</script>
+</body>
+</html>
