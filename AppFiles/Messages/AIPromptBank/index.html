@@ -836,7 +836,17 @@
               "content": "Here is the full error message / stack trace / console output: [paste]. Please explain what it means in plain English, point to the likely line(s) of code responsible, and suggest a fix."
             }
           ]
-        }
+        },
+        {
+  "name": "👾 Game Dev Debug",
+  "description": "",
+  "texts": [
+    {
+      "title": "⚖️ Balancing improvements",
+      "content": "You are an expert game designer and systems balancer. Analyze the submitted game app code in full, and identify and fix any and all detectable balance issues.\n\nDesign premise (must be preserved and reinforced by every change):\n- The game should be genuinely CHALLENGING — the player must engage skillfully, not coast.\n- The game should be BALANCED — no dominant strategy, no useless mechanic, no stat/item/enemy that trivializes or breaks the intended difficulty curve.\n- The game should be REWARDING — effort, skill, and good decisions should feel meaningfully paid off; progression and reward rates should feel earned, not stingy or trivial.\n- There should be a real, non-trivial chance of FAILURE — losing must be a genuine possibility given imperfect play, not a near-impossible edge case — but failure must never feel unfun, cheap, or unfair (e.g. no unavoidable damage, no random instant-death with no counterplay, no punishing the player for things outside their control).\n\nWhat to do:\n1. Read through the game's code (systems, stats, formulas, drop tables, enemy/AI parameters, economy, progression curves, cooldowns, difficulty scaling, RNG ranges, etc.).\n2. Identify concrete, specific balance issues — e.g. stats or items that are overpowered/underpowered, enemies that are trivial or unfairly punishing, reward curves that are too generous or too stingy, difficulty spikes or valleys, exploitable loops, dominant strategies, dead mechanics, unfair RNG, or missing failure states.\n3. For each issue found, explain: (a) what the issue is and where in the code it lives, (b) why it violates the challenging/balanced/rewarding/fair-failure premise, and (c) the specific fix — with exact numeric/logic changes, not vague suggestions.\n4. Apply the fixes directly to the code, keeping changes minimal and surgical — don't refactor unrelated systems.\n5. After the fixes, give a short summary of the net effect on difficulty, reward pacing, and failure rate, and flag any remaining risks or tradeoffs.\n6. If information needed to judge balance is missing (e.g. no visibility into playtesting data or intended difficulty target), state your assumptions explicitly rather than guessing silently.\n\nUser-reported balance issues to prioritize and address (fill in below):\n- \n- \n- \n\nIf the list above is empty, perform a full independent balance audit of the entire codebase instead."
+    }
+  ]
+}
       ]
     },
     {
