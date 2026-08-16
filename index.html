@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Message Templates Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0b0e14;
+            --bg-card: #141a24;
+            --bg-input: #1f2937;
+            --border-color: #252e3e;
+            --text-primary: #e4e7ed;
+            --text-secondary: #8b95a9;
+            --text-muted: #5f6d87;
+            --accent: #2d7aff;
+            --accent-hover: #1e6af0;
+            --success: #1f8b4c;
+            --success-hover: #1a7a42;
+            --radius: 20px;
+            --radius-sm: 12px;
+            --shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 1.5rem 1rem;
+        }
+
+        .app {
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .header .badge {
+            background: var(--bg-input);
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            padding: 0.2rem 0.9rem;
+            border-radius: 30px;
+            border: 1px solid var(--border-color);
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+            border-left: 3px solid var(--accent);
+            padding-left: 1rem;
+        }
+
+        /* Back button */
+        .back-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+
+        .back-btn:hover {
+            background: var(--bg-input);
+            border-color: #3a465c;
+            color: var(--text-primary);
+        }
+
+        .back-btn.hidden {
+            display: none;
+        }
+
+        /* Scan status */
+        .scan-status {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 0.6rem 1.2rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .scan-status .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--border-color);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .scan-status .done {
+            color: #4ade80;
+        }
+
+        /* Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.25rem;
+            margin-top: 1.5rem;
+        }
+
+        .template-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1.5rem 1.25rem;
+            cursor: pointer;
+            transition: 0.25s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .template-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(45, 122, 255, 0.08);
+        }
+
+        .template-card .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .template-card h3 {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .template-card .desc {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            flex: 1;
+            margin-bottom: 0.8rem;
+            line-height: 1.4;
+        }
+
+        .template-card .meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
+            padding-top: 0.7rem;
+            margin-top: auto;
+        }
+
+        .template-card .meta .tag {
+            background: var(--bg-input);
+            padding: 0.15rem 0.7rem;
+            border-radius: 30px;
+            border: 1px solid var(--border-color);
+            font-family: monospace;
+            font-size: 0.65rem;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 1rem;
+            color: var(--text-secondary);
+            grid-column: 1/-1;
+        }
+
+        .empty-state .big-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h3 {
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            font-size: 0.9rem;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .empty-state code {
+            background: var(--bg-input);
+            padding: 0.1rem 0.5rem;
+            border-radius: 4px;
+            color: var(--text-primary);
+        }
+
+        /* Message app container */
+        .message-app-container {
+            display: none;
+            margin-top: 1rem;
+        }
+
+        .message-app-container.active {
+            display: block;
+        }
+
+        .hub-view {
+            display: block;
+        }
+
+        .hub-view.hidden {
+            display: none;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 0.75rem 2rem;
+            border-radius: 60px;
+            font-size: 0.9rem;
+            color: #b8e2b8;
+            box-shadow: var(--shadow);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 999;
+            max-width: 90%;
+            text-align: center;
+        }
+
+        .toast.error {
+            color: #f87171;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .header h1 {
+                font-size: 1.4rem;
+            }
+            .back-btn {
+                font-size: 0.8rem;
+                padding: 0.4rem 1rem;
+            }
+            .scan-status {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <!-- Header -->
+    <div class="header">
+        <h1>📬 Message Templates</h1>
+        <span class="badge" id="templateCount">scanning...</span>
+        <button class="back-btn hidden" id="backBtn">← Back to hub</button>
+    </div>
+    <div class="subtitle">Select a template to generate a custom message</div>
+
+    <!-- Scan Status -->
+    <div class="scan-status" id="scanStatus">
+        <span class="spinner" id="scanSpinner"></span>
+        <span id="scanText">Scanning AppFiles/Messages/...</span>
+    </div>
+
+    <!-- Hub View -->
+    <div class="hub-view" id="hubView">
+        <div class="grid" id="templateGrid">
+            <!-- Cards injected here -->
+        </div>
+    </div>
+
+    <!-- Message App Container -->
+    <div class="message-app-container" id="messageAppContainer">
+        <div id="messageAppContent">
+            <!-- Dynamically loaded HTML from the selected app -->
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+</div>
+
+<script>
+    (function() {
+        // ----- Configuration -----
+        const APP_FILES_PATH = 'AppFiles/Messages/';
+
+        // ----- State -----
+        let templates = [];
+        let currentTemplate = null;
+        let isScanning = false;
+
+        // ----- DOM refs -----
+        const hubView = document.getElementById('hubView');
+        const grid = document.getElementById('templateGrid');
+        const msgContainer = document.getElementById('messageAppContainer');
+        const msgContent = document.getElementById('messageAppContent');
+        const backBtn = document.getElementById('backBtn');
+        const templateCount = document.getElementById('templateCount');
+        const scanStatus = document.getElementById('scanStatus');
+        const scanSpinner = document.getElementById('scanSpinner');
+        const scanText = document.getElementById('scanText');
+        const toast = document.getElementById('toast');
+
+        let toastTimeout = null;
+
+        // ----- Toast helper -----
+        function showToast(text, duration = 2200, isError = false) {
+            toast.textContent = text;
+            toast.className = 'toast' + (isError ? ' error' : '');
+            toast.classList.add('show');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, duration);
+        }
+
+        // ----- Fetch directory listing via manifest -----
+        async function scanDirectory() {
+            isScanning = true;
+            scanSpinner.style.display = 'inline-block';
+            scanText.textContent = 'Scanning AppFiles/Messages/...';
+            templateCount.textContent = 'scanning...';
+
+            try {
+                // Try to fetch a manifest file that lists all templates
+                // This is the recommended approach for static hosting
+                let manifest = null;
+                try {
+                    const manifestResponse = await fetch(APP_FILES_PATH + 'manifest.json');
+                    if (manifestResponse.ok) {
+                        manifest = await manifestResponse.json();
+                    }
+                } catch (e) {
+                    // Manifest not found, continue
+                }
+
+                if (manifest && manifest.templates) {
+                    // Use manifest data
+                    templates = manifest.templates.map(t => ({
+                        id: t.id || t.file.replace('.html', ''),
+                        name: t.name || t.id || 'Unnamed',
+                        description: t.description || 'No description',
+                        icon: t.icon || '📄',
+                        file: t.file,
+                        path: APP_FILES_PATH + t.file,
+                        tags: t.tags || [],
+                        folder: t.folder || ''
+                    }));
+                } else {
+                    // Fallback: try to discover by checking known paths
+                    // This is the actual file system scanner simulation
+                    const knownPaths = [
+                        'RefundRequest/index.html',
+                        'GDPRErasure/index.html',
+                        'ComplaintLetter/index.html',
+                        'LatePayment/index.html',
+                        'Cancellation/index.html'
+                    ];
+
+                    const discovered = [];
+                    for (const path of knownPaths) {
+                        try {
+                            const fullPath = APP_FILES_PATH + path;
+                            const response = await fetch(fullPath, { method: 'HEAD' });
+                            if (response.ok) {
+                                // Extract folder name as template name
+                                const folder = path.split('/')[0];
+                                const name = folder.replace(/([A-Z])/g, ' $1').trim();
+                                discovered.push({
+                                    id: folder.toLowerCase(),
+                                    name: name || folder,
+                                    description: `Template from ${folder}`,
+                                    icon: '📄',
+                                    file: path,
+                                    path: fullPath,
+                                    tags: [folder],
+                                    folder: folder
+                                });
+                            }
+                        } catch (e) {
+                            // File not found, skip
+                        }
+                    }
+
+                    if (discovered.length > 0) {
+                        templates = discovered;
+                    } else {
+                        // No templates found, use fallback
+                        templates = [];
+                    }
+                }
+
+                // If still no templates, add fallback
+                if (templates.length === 0) {
+                    // Add the RefundRequest as a default if it exists
+                    try {
+                        const testPath = APP_FILES_PATH + 'RefundRequest/index.html';
+                        const response = await fetch(testPath, { method: 'HEAD' });
+                        if (response.ok) {
+                            templates.push({
+                                id: 'refundrequest',
+                                name: 'Refund Request',
+                                description: 'UK Consumer Law refund template',
+                                icon: '⚖️',
+                                file: 'RefundRequest/index.html',
+                                path: testPath,
+                                tags: ['Consumer', 'UK'],
+                                folder: 'RefundRequest'
+                            });
+                        }
+                    } catch (e) {
+                        // RefundRequest not found
+                    }
+                }
+
+            } catch (error) {
+                console.error('Scan error:', error);
+                showToast('Error scanning templates', 3000, true);
+            } finally {
+                isScanning = false;
+                scanSpinner.style.display = 'none';
+                scanText.textContent = `✅ Found ${templates.length} template(s)`;
+                templateCount.textContent = `${templates.length} loaded`;
+                renderGrid();
+            }
+        }
+
+        // ----- Render the grid -----
+        function renderGrid() {
+            grid.innerHTML = '';
+
+            if (templates.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="big-icon">📂</div>
+                        <h3>No templates found</h3>
+                        <p>Place HTML files in <code>AppFiles/Messages/</code> to see them here.</p>
+                        <p style="margin-top:0.5rem;font-size:0.8rem;">
+                            Expected structure: <code>AppFiles/Messages/RefundRequest/index.html</code>
+                        </p>
+                        <button onclick="window.scanDirectory()" style="margin-top:1.5rem;background:var(--accent);border:none;color:#fff;padding:0.6rem 1.5rem;border-radius:40px;cursor:pointer;font-family:inherit;">
+                            🔄 Rescan
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            templates.forEach((app, index) => {
+                const card = document.createElement('div');
+                card.className = 'template-card';
+                card.setAttribute('data-index', index);
+                card.innerHTML = `
+                    <div class="icon">${app.icon || '📄'}</div>
+                    <h3>${app.name}</h3>
+                    <div class="desc">${app.description || 'No description'}</div>
+                    <div class="meta">
+                        <span>${app.tags ? app.tags.slice(0,2).join(' · ') : '📁 ' + (app.folder || app.file)}</span>
+                        <span class="tag">${app.file.split('/').pop() || app.file}</span>
+                    </div>
+                `;
+                card.addEventListener('click', () => openTemplate(index));
+                grid.appendChild(card);
+            });
+        }
+
+        // ----- Open a template (load its HTML) -----
+        async function openTemplate(index) {
+            const app = templates[index];
+            if (!app) return;
+
+            currentTemplate = app;
+
+            // Show loading state
+            msgContent.innerHTML = `
+                <div style="text-align:center;padding:3rem 1rem;color:var(--text-secondary);background:var(--bg-card);border-radius:var(--radius);border:1px solid var(--border-color);">
+                    <div style="font-size:2rem;margin-bottom:1rem;">⏳</div>
+                    <p>Loading ${app.name}...</p>
+                    <p style="font-size:0.8rem;margin-top:0.5rem;color:var(--text-muted);">${app.path}</p>
+                </div>
+            `;
+            msgContainer.classList.add('active');
+            hubView.classList.add('hidden');
+            backBtn.classList.remove('hidden');
+
+            try {
+                // Attempt to fetch the HTML file
+                const response = await fetch(app.path);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                let html = await response.text();
+
+                // Clean up the HTML to avoid conflicts
+                // Remove any existing styles that might conflict
+                // But preserve the content
+
+                // Inject the HTML into the container
+                // We need to execute scripts in the loaded HTML
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+
+                // Find all script tags in the loaded HTML
+                const scripts = tempDiv.querySelectorAll('script');
+                const scriptContents = [];
+                scripts.forEach(script => {
+                    if (script.textContent.trim()) {
+                        scriptContents.push(script.textContent);
+                    }
+                    script.remove();
+                });
+
+                // Set the HTML (without script tags)
+                msgContent.innerHTML = tempDiv.innerHTML;
+
+                // Execute scripts in order
+                scriptContents.forEach(code => {
+                    try {
+                        // Use Function constructor to avoid eval issues
+                        const fn = new Function(code);
+                        fn();
+                    } catch (e) {
+                        console.warn('Script execution error:', e);
+                    }
+                });
+
+                // Re-initialize any custom components
+                // If the loaded app exposes an init function, call it
+                if (window._messageAppInit) {
+                    try {
+                        window._messageAppInit();
+                    } catch (e) {
+                        console.warn('Init error:', e);
+                    }
+                }
+
+                // If the app has a specific initialization function name
+                if (window.initMessageApp) {
+                    try {
+                        window.initMessageApp();
+                    } catch (e) {
+                        console.warn('initMessageApp error:', e);
+                    }
+                }
+
+                showToast(`✓ Loaded "${app.name}"`);
+
+            } catch (error) {
+                console.error('Failed to load app:', error);
+                // Show fallback content
+                msgContent.innerHTML = generateFallbackApp(app);
+                showToast(`⚠️ Could not load ${app.file}`, 3000, true);
+            }
+
+            // Scroll to top of the app
+            msgContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // ----- Generate a fallback app when the HTML file can't be loaded -----
+        function generateFallbackApp(app) {
+            return `
+                <div style="background:var(--bg-card);border-radius:var(--radius);padding:1.75rem 1.5rem;border:1px solid var(--border-color);">
+                    <h2 style="margin-bottom:0.3rem;">${app.icon || '📄'} ${app.name}</h2>
+                    <p style="color:var(--text-secondary);margin-bottom:1.5rem;">${app.description || 'Template'}</p>
+
+                    <div style="background:var(--bg-input);border-radius:var(--radius-sm);padding:1rem;margin-bottom:1rem;border:1px solid var(--border-color);">
+                        <p style="color:var(--text-secondary);font-size:0.8rem;">⚠️ Could not load <code>${app.file}</code></p>
+                        <p style="color:var(--text-secondary);font-size:0.8rem;margin-top:0.3rem;">
+                            Expected path: <code>${app.path}</code>
+                        </p>
+                        <p style="color:var(--text-secondary);font-size:0.8rem;margin-top:0.3rem;">
+                            Please ensure the file exists and is accessible.
+                        </p>
+                    </div>
+
+                    <div style="display:flex;gap:0.8rem;flex-wrap:wrap;margin-top:0.5rem;">
+                        <button onclick="window.goBack()" style="background:var(--accent);border:none;color:#fff;padding:0.7rem 1.6rem;border-radius:40px;font-weight:500;cursor:pointer;font-family:inherit;">
+                            ← Back to Hub
+                        </button>
+                        <button onclick="window.scanDirectory()" style="background:transparent;border:1px solid var(--border-color);color:var(--text-secondary);padding:0.7rem 1.6rem;border-radius:40px;cursor:pointer;font-family:inherit;">
+                            🔄 Rescan
+                        </button>
+                    </div>
+
+                    <div style="margin-top:1.5rem;background:var(--bg-input);border-radius:var(--radius-sm);padding:1rem;border:1px solid var(--border-color);">
+                        <div style="color:var(--text-secondary);font-size:0.75rem;margin-bottom:0.3rem;">💡 Tip</div>
+                        <div style="font-size:0.85rem;line-height:1.6;color:var(--text-secondary);">
+                            Place your template HTML file at:<br />
+                            <code style="color:var(--text-primary);">${app.path}</code>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ----- Go back to hub -----
+        function goBack() {
+            msgContainer.classList.remove('active');
+            hubView.classList.remove('hidden');
+            backBtn.classList.add('hidden');
+            currentTemplate = null;
+            msgContent.innerHTML = '';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ----- Expose functions globally -----
+        window.goBack = goBack;
+        window.showToast = showToast;
+        window.scanDirectory = scanDirectory;
+        window.__appBasePath = APP_FILES_PATH;
+
+        // ----- Handle back button -----
+        backBtn.addEventListener('click', goBack);
+
+        // ----- Handle browser back button -----
+        window.addEventListener('popstate', (event) => {
+            if (msgContainer.classList.contains('active')) {
+                goBack();
+            }
+        });
+
+        // ----- Initialize -----
+        // Start scanning
+        scanDirectory();
+
+        console.log('📬 Message Templates Hub loaded.');
+        console.log(`📂 Scanning: ${APP_FILES_PATH}`);
+        console.log('🔍 Use window.scanDirectory() to rescan.');
+
+        // Handle hash navigation
+        if (window.location.hash) {
+            const hash = window.location.hash.replace('#', '');
+            setTimeout(() => {
+                const foundIndex = templates.findIndex(t => 
+                    t.id === hash || 
+                    t.file === hash || 
+                    t.folder === hash
+                );
+                if (foundIndex !== -1) {
+                    openTemplate(foundIndex);
+                }
+            }, 500);
+        }
+    })();
+</script>
+</body>
+</html>
