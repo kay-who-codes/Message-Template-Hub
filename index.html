@@ -569,9 +569,11 @@
                 // Execute scripts in order
                 scriptContents.forEach(code => {
                     try {
-                        // Use Function constructor to avoid eval issues
-                        const fn = new Function(code);
-                        fn();
+                        const scriptEl = document.createElement('script');
+                        scriptEl.textContent = code;
+                        // Give it an identifiable marker so goBack() can clean it up
+                        scriptEl.setAttribute('data-app-script', 'true');
+                        document.body.appendChild(scriptEl);
                     } catch (e) {
                         console.warn('Script execution error:', e);
                     }
@@ -646,14 +648,17 @@
             `;
         }
 
-        // ----- Go back to hub -----
         function goBack() {
-            msgContainer.classList.remove('active');
-            hubView.classList.remove('hidden');
-            backBtn.classList.add('hidden');
-            currentTemplate = null;
-            msgContent.innerHTML = '';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        msgContainer.classList.remove('active');
+        hubView.classList.remove('hidden');
+        backBtn.classList.add('hidden');
+        currentTemplate = null;
+        msgContent.innerHTML = '';
+    
+        // Remove previously injected app scripts to avoid stale state
+        document.querySelectorAll('script[data-app-script]').forEach(el => el.remove());
+    
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         // ----- Expose functions globally -----
