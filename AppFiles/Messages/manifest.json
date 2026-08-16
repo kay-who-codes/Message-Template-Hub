@@ -1,11 +1,11 @@
 {
   "templates": [
     {
-      "id": "aicopybank",
-      "name": "AI CopyBank",
+      "id": "aipromptbank",
+      "name": "AI PromptBank",
       "description": "Ready-to-copy prompts for building, debugging, and designing with AI",
       "icon": "🤖",
-      "file": "AICopyBank/index.html",
+      "file": "AIPromptBank/index.html",
       "tags": ["AI", "Prompts"]
     },
     {
