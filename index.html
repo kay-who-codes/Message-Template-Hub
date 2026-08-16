@@ -250,6 +250,30 @@
             display: none;
         }
 
+        .message-app-container{
+            display:none;
+        }
+        .message-app-container.active{
+            display:flex;
+            flex-direction:column;
+            /* Fill the viewport minus whatever header/subtitle/scan-status/back-btn
+               chrome sits above it. Adjust the subtracted value to match actual
+               header height if it differs. */
+            height:calc(100vh - 140px);
+        }
+        #messageAppContent{
+            flex:1;
+            min-height:0; /* required so a flex child can actually shrink/scroll instead of overflowing */
+            display:flex;
+        }
+        #templateFrame{
+            flex:1;
+            width:100%;
+            height:100%;
+            border:0;
+            display:block;
+        }
+
         /* Toast */
         .toast {
             position: fixed;
@@ -336,12 +360,10 @@
     (function() {
         // ----- Configuration -----
         const APP_FILES_PATH = 'AppFiles/Messages/';
-
         // ----- State -----
         let templates = [];
         let currentTemplate = null;
         let isScanning = false;
-
         // ----- DOM refs -----
         const hubView = document.getElementById('hubView');
         const grid = document.getElementById('templateGrid');
@@ -353,9 +375,7 @@
         const scanSpinner = document.getElementById('scanSpinner');
         const scanText = document.getElementById('scanText');
         const toast = document.getElementById('toast');
-
         let toastTimeout = null;
-
         // ----- Toast helper -----
         function showToast(text, duration = 2200, isError = false) {
             toast.textContent = text;
@@ -366,17 +386,13 @@
                 toast.classList.remove('show');
             }, duration);
         }
-
         // ----- Fetch directory listing via manifest -----
         async function scanDirectory() {
             isScanning = true;
             scanSpinner.style.display = 'inline-block';
             scanText.textContent = 'Scanning AppFiles/Messages/...';
             templateCount.textContent = 'scanning...';
-
             try {
-                // Try to fetch a manifest file that lists all templates
-                // This is the recommended approach for static hosting
                 let manifest = null;
                 try {
                     const manifestResponse = await fetch(APP_FILES_PATH + 'manifest.json');
@@ -386,9 +402,7 @@
                 } catch (e) {
                     // Manifest not found, continue
                 }
-
                 if (manifest && manifest.templates) {
-                    // Use manifest data
                     templates = manifest.templates.map(t => ({
                         id: t.id || t.file.replace('.html', ''),
                         name: t.name || t.id || 'Unnamed',
@@ -400,8 +414,6 @@
                         folder: t.folder || ''
                     }));
                 } else {
-                    // Fallback: try to discover by checking known paths
-                    // This is the actual file system scanner simulation
                     const knownPaths = [
                         'RefundRequest/index.html',
                         'GDPRErasure/index.html',
@@ -409,14 +421,12 @@
                         'LatePayment/index.html',
                         'Cancellation/index.html'
                     ];
-
                     const discovered = [];
                     for (const path of knownPaths) {
                         try {
                             const fullPath = APP_FILES_PATH + path;
                             const response = await fetch(fullPath, { method: 'HEAD' });
                             if (response.ok) {
-                                // Extract folder name as template name
                                 const folder = path.split('/')[0];
                                 const name = folder.replace(/([A-Z])/g, ' $1').trim();
                                 discovered.push({
@@ -434,18 +444,13 @@
                             // File not found, skip
                         }
                     }
-
                     if (discovered.length > 0) {
                         templates = discovered;
                     } else {
-                        // No templates found, use fallback
                         templates = [];
                     }
                 }
-
-                // If still no templates, add fallback
                 if (templates.length === 0) {
-                    // Add the RefundRequest as a default if it exists
                     try {
                         const testPath = APP_FILES_PATH + 'RefundRequest/index.html';
                         const response = await fetch(testPath, { method: 'HEAD' });
@@ -465,7 +470,6 @@
                         // RefundRequest not found
                     }
                 }
-
             } catch (error) {
                 console.error('Scan error:', error);
                 showToast('Error scanning templates', 3000, true);
@@ -477,11 +481,9 @@
                 renderGrid();
             }
         }
-
         // ----- Render the grid -----
         function renderGrid() {
             grid.innerHTML = '';
-
             if (templates.length === 0) {
                 grid.innerHTML = `
                     <div class="empty-state">
@@ -498,7 +500,6 @@
                 `;
                 return;
             }
-
             templates.forEach((app, index) => {
                 const card = document.createElement('div');
                 card.className = 'template-card';
@@ -516,85 +517,72 @@
                 grid.appendChild(card);
             });
         }
-
         // ----- Open a template (load its HTML) -----
         async function openTemplate(index) {
             const app = templates[index];
             if (!app) return;
-
             currentTemplate = app;
-
-            // Show loading state
+ 
+            msgContainer.classList.add('active');
+            hubView.classList.add('hidden');
+            backBtn.classList.remove('hidden');
+ 
             msgContent.innerHTML = `
-                <div style="text-align:center;padding:3rem 1rem;color:var(--text-secondary);background:var(--bg-card);border-radius:var(--radius);border:1px solid var(--border-color);">
+                <div style="text-align:center;padding:3rem 1rem;color:var(--text-secondary);background:var(--bg-card);border-radius:var(--radius);border:1px solid var(--border-color);width:100%;">
                     <div style="font-size:2rem;margin-bottom:1rem;">⏳</div>
                     <p>Loading ${app.name}...</p>
                     <p style="font-size:0.8rem;margin-top:0.5rem;color:var(--text-muted);">${app.path}</p>
                 </div>
             `;
-            msgContainer.classList.add('active');
-            hubView.classList.add('hidden');
-            backBtn.classList.remove('hidden');
-
+ 
             try {
                 // Load the template in its own iframe so it gets a real document
-                // lifecycle (DOMContentLoaded fires normally) and relative
-                // fetch()/asset paths resolve against the app's own folder, not the hub.
+                // lifecycle and relative fetch()/asset paths resolve against the
+                // app's own folder. The iframe is sized by CSS (see
+                // .message-app-container.active / #templateFrame above) to fill
+                // available space — we do NOT try to auto-size the iframe to its
+                // content's scrollHeight, because apps like this one use
+                // height:100%/100vh internally with overflow:hidden and manage
+                // their own internal scrolling. Auto-sizing to scrollHeight in
+                // that situation is circular (content sizes to viewport, you're
+                // trying to size the viewport to content) and just collapses to
+                // whatever the iframe's starting height happened to be.
                 msgContent.innerHTML = '';
                 const iframe = document.createElement('iframe');
                 iframe.id = 'templateFrame';
                 iframe.setAttribute('title', app.name);
-                iframe.style.cssText = 'width:100%;border:0;display:block;min-height:200px;';
-            
+ 
                 const loadTimeout = setTimeout(() => {
                     showToast(`⚠️ ${app.name} is taking a while to load`, 3000, true);
                 }, 8000);
-            
+ 
                 iframe.addEventListener('load', () => {
                     clearTimeout(loadTimeout);
-                    try {
-                        // Auto-size the iframe to its content's height
-                        const doc = iframe.contentWindow.document;
-                        const resize = () => {
-                            iframe.style.height = doc.documentElement.scrollHeight + 'px';
-                        };
-                        resize();
-                        // Re-measure if the app's content changes height after load
-                        // (e.g. expanding a card)
-                        new iframe.contentWindow.ResizeObserver(resize).observe(doc.body);
-                    } catch (e) {
-                        // Cross-origin or other access issue — leave default height
-                        console.warn('Could not auto-size iframe:', e);
-                    }
                     showToast(`✓ Loaded "${app.name}"`);
                 });
-            
+ 
                 iframe.addEventListener('error', () => {
                     clearTimeout(loadTimeout);
                     msgContent.innerHTML = generateFallbackApp(app);
                     showToast(`⚠️ Could not load ${app.file}`, 3000, true);
                 });
-            
+ 
                 iframe.src = app.path;
                 msgContent.appendChild(iframe);
-            
+ 
             } catch (error) {
                 console.error('Failed to load app:', error);
                 msgContent.innerHTML = generateFallbackApp(app);
                 showToast(`⚠️ Could not load ${app.file}`, 3000, true);
             }
-
-            // Scroll to top of the app
             msgContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-
         // ----- Generate a fallback app when the HTML file can't be loaded -----
         function generateFallbackApp(app) {
             return `
-                <div style="background:var(--bg-card);border-radius:var(--radius);padding:1.75rem 1.5rem;border:1px solid var(--border-color);">
+                <div style="background:var(--bg-card);border-radius:var(--radius);padding:1.75rem 1.5rem;border:1px solid var(--border-color);width:100%;">
                     <h2 style="margin-bottom:0.3rem;">${app.icon || '📄'} ${app.name}</h2>
                     <p style="color:var(--text-secondary);margin-bottom:1.5rem;">${app.description || 'Template'}</p>
-
                     <div style="background:var(--bg-input);border-radius:var(--radius-sm);padding:1rem;margin-bottom:1rem;border:1px solid var(--border-color);">
                         <p style="color:var(--text-secondary);font-size:0.8rem;">⚠️ Could not load <code>${app.file}</code></p>
                         <p style="color:var(--text-secondary);font-size:0.8rem;margin-top:0.3rem;">
@@ -604,7 +592,6 @@
                             Please ensure the file exists and is accessible.
                         </p>
                     </div>
-
                     <div style="display:flex;gap:0.8rem;flex-wrap:wrap;margin-top:0.5rem;">
                         <button onclick="window.goBack()" style="background:var(--accent);border:none;color:#fff;padding:0.7rem 1.6rem;border-radius:40px;font-weight:500;cursor:pointer;font-family:inherit;">
                             ← Back to Hub
@@ -613,7 +600,6 @@
                             🔄 Rescan
                         </button>
                     </div>
-
                     <div style="margin-top:1.5rem;background:var(--bg-input);border-radius:var(--radius-sm);padding:1rem;border:1px solid var(--border-color);">
                         <div style="color:var(--text-secondary);font-size:0.75rem;margin-bottom:0.3rem;">💡 Tip</div>
                         <div style="font-size:0.85rem;line-height:1.6;color:var(--text-secondary);">
@@ -624,45 +610,33 @@
                 </div>
             `;
         }
-
         function goBack() {
-        msgContainer.classList.remove('active');
-        hubView.classList.remove('hidden');
-        backBtn.classList.add('hidden');
-        currentTemplate = null;
-        msgContent.innerHTML = '';
-    
-        // Remove previously injected app scripts to avoid stale state
-        document.querySelectorAll('script[data-app-script]').forEach(el => el.remove());
-    
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+            msgContainer.classList.remove('active');
+            hubView.classList.remove('hidden');
+            backBtn.classList.add('hidden');
+            currentTemplate = null;
+            msgContent.innerHTML = '';
+            document.querySelectorAll('script[data-app-script]').forEach(el => el.remove());
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-
         // ----- Expose functions globally -----
         window.goBack = goBack;
         window.showToast = showToast;
         window.scanDirectory = scanDirectory;
         window.__appBasePath = APP_FILES_PATH;
-
         // ----- Handle back button -----
         backBtn.addEventListener('click', goBack);
-
         // ----- Handle browser back button -----
         window.addEventListener('popstate', (event) => {
             if (msgContainer.classList.contains('active')) {
                 goBack();
             }
         });
-
         // ----- Initialize -----
-        // Start scanning
         scanDirectory();
-
         console.log('📬 Message Templates Hub loaded.');
         console.log(`📂 Scanning: ${APP_FILES_PATH}`);
         console.log('🔍 Use window.scanDirectory() to rescan.');
-
-        // Handle hash navigation
         if (window.location.hash) {
             const hash = window.location.hash.replace('#', '');
             setTimeout(() => {
